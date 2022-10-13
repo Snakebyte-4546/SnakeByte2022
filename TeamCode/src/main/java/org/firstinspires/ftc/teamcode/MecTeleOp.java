@@ -9,10 +9,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "MecTeleOp", group = "TeleOp")
 public class MecTeleOp extends OpMode {
     // wheels make a diamond shape looking from above
+
+    //Driving Motor
     DcMotor fl;
     DcMotor fr;
     DcMotor bl;
     DcMotor br;
+
+    //Lift Motor
+    DcMotor lift;
 
     @Override
     public void init() {
@@ -34,6 +39,11 @@ public class MecTeleOp extends OpMode {
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
         br.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        lift = hardwareMap.dcMotor.get("lift");
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     @Override
@@ -65,7 +75,11 @@ public class MecTeleOp extends OpMode {
             bl.setPower(0);
             br.setPower(0);
         }
-
+        if(Math.abs(gamepad2.right_stick_y) > 0.1){
+            lift.setPower(gamepad1.right_stick_y);
+        } else{
+            lift.setPower(0);
+        }
     }
 }
 
