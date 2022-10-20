@@ -37,7 +37,7 @@ public class MecTeleOp extends OpMode {
         fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-<<<<<<< Updated upstream
+
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
         br.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -45,8 +45,6 @@ public class MecTeleOp extends OpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-=======
->>>>>>> Stashed changes
     }
 
     @Override
@@ -78,15 +76,12 @@ public class MecTeleOp extends OpMode {
             bl.setPower(0);
             br.setPower(0);
         }
-<<<<<<< Updated upstream
         if(Math.abs(gamepad2.right_stick_y) > 0.1){
             lift.setPower(gamepad1.right_stick_y);
         } else{
             lift.setPower(0);
         }
-=======
-        
->>>>>>> Stashed changes
+
     }
 }
 
