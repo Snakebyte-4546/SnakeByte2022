@@ -85,3 +85,16 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# System Files (Mac)
+.DS_Store
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDouble
+.LSOverride
+._*
