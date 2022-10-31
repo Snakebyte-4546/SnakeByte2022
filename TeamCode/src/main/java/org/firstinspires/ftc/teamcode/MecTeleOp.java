@@ -19,6 +19,11 @@ public class MecTeleOp extends OpMode {
     //Lift Motor
     DcMotor lift;
 
+    // Clamp Servos
+    Servo right;
+    Servo left;
+
+
     @Override
     public void init() {
         fl = hardwareMap.dcMotor.get("fl");
@@ -37,28 +42,30 @@ public class MecTeleOp extends OpMode {
         fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
         br.setDirection(DcMotorSimple.Direction.REVERSE);
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
 
         lift = hardwareMap.dcMotor.get("lift");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     @Override
     public void loop() {
         if(Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
-            double lx = gamepad1.left_stick_x;
-            double ly = -gamepad1.right_stick_x;
-            double rx = gamepad1.left_stick_y;
+            double lx = -gamepad1.left_stick_x;
+            double ly = gamepad1.left_stick_y;
+            double rx = gamepad1.right_stick_x;
             double denominator = Math.max(Math.abs(lx) + Math.abs(ly) + Math.abs(rx), 1);
-            double FLP = (ly + lx + rx) / denominator;
+            double FLP = (ly - lx + rx) / denominator;
             double FRP = (ly - lx - rx) / denominator;
-            double BLP = (ly - lx + rx) / denominator;
-            double BRP = (ly + lx - rx) / denominator ;
-            if(gamepad1.right_trigger > 0.1){
+            double BLP = (ly + lx + rx) / denominator;
+            double BRP = (ly + lx - rx) / denominator;
+            if (gamepad1.right_trigger > 0.1) {
                 fl.setPower(FLP * .35);
                 fr.setPower(FRP * .35);
                 bl.setPower(BLP * .35);
@@ -77,10 +84,12 @@ public class MecTeleOp extends OpMode {
             br.setPower(0);
         }
         if(Math.abs(gamepad2.right_stick_y) > 0.1){
-            lift.setPower(gamepad1.right_stick_y);
+            lift.setPower(gamepad2.right_stick_y);
         } else{
             lift.setPower(0);
         }
+
+
 
     }
 }
