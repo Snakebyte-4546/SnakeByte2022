@@ -52,6 +52,11 @@ public class MecTeleOp extends OpMode {
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
+        right = hardwareMap.servo.get("rightServo");
+        left = hardwareMap.servo.get("leftServo");
+        right.setPosition(1);
+        left.setPosition(0);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class MecTeleOp extends OpMode {
         if(Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
             double lx = -gamepad1.left_stick_x;
             double ly = gamepad1.left_stick_y;
-            double rx = gamepad1.right_stick_x;
+            double rx = -gamepad1.right_stick_x;
             double denominator = Math.max(Math.abs(lx) + Math.abs(ly) + Math.abs(rx), 1);
             double FLP = (ly - lx + rx) / denominator;
             double FRP = (ly - lx - rx) / denominator;
@@ -84,12 +89,19 @@ public class MecTeleOp extends OpMode {
             br.setPower(0);
         }
         if(Math.abs(gamepad2.right_stick_y) > 0.1){
-            lift.setPower(gamepad2.right_stick_y);
+            lift.setPower(gamepad2.right_stick_y*.5);
         } else{
             lift.setPower(0);
         }
 
-
+        if(gamepad2.b){
+            right.setPosition(.8);
+            left.setPosition(.2);
+        }
+        if(gamepad2.a){
+            right.setPosition(1);
+            left.setPosition(0);
+        }
 
     }
 }
