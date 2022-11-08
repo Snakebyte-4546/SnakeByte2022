@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 @Autonomous(name = "Park Auto", group = "Auto")
 public class ParkAuto extends LinearOpMode {
-    AutoMethods robot = new AutoMethods();
 
     int tagOfInterest = 0;
 
@@ -53,21 +52,20 @@ public class ParkAuto extends LinearOpMode {
 
         waitForStart();
 
-        while(!isStopRequested() && opModeIsActive()){
-            if(tagOfInterest == 1) {
-                robot.MoveInchEncoder(-1,650);
-                robot.Strafe(1, 650);
+        if(tagOfInterest == 1) {
+                robot.MoveInchEncoder(-1,950);
+                robot.Strafe(1, 1800);
             } else if(tagOfInterest == 2) {
-                robot.Strafe(1, 650);
+            robot.MoveInchEncoder(-1,75);
+            robot.Strafe(1, 1800);
             } else if (tagOfInterest == 3) {
-                robot.MoveInchEncoder(1,650);
-                robot.Strafe(1, 650);
+            robot.MoveInchEncoder(1,900);
+            robot.Strafe(1, 1800);
             } else {
                 telemetry.clearAll();
                 telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
                 telemetry.update();
             }
-        }
     }
 }
 

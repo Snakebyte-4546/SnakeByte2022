@@ -16,6 +16,7 @@ public class TeleLib {
     public Servo left;
 
     OpMode opMode;
+    boolean isOpen = false;
 
     public TeleLib(OpMode opMode) {
         fl = opMode.hardwareMap.dcMotor.get("fl");
@@ -65,8 +66,8 @@ public class TeleLib {
             double y = opMode.gamepad1.left_stick_y;
             double rx = -opMode.gamepad1.right_stick_x;
             double denom = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double FLP = (y + x + rx) / denom;
-            double BLP = (y - x + rx) / denom;
+            double FLP = (y - x + rx) / denom;
+            double BLP = (y + x + rx) / denom;
             double FRP = (y - x - rx) / denom;
             double BRP = (y + x - rx) / denom;
 
@@ -91,22 +92,23 @@ public class TeleLib {
     }
     
     public void lift(OpMode opMode) {
-        if(Math.abs(opMode.gamepad2.right_stick_y) > 0.1) {
+        if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
             lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lift.setPower(opMode.gamepad2.right_stick_y*-.5);
+            lift.setPower(opMode.gamepad2.left_stick_y*-.75);
         } else {
             lift.setTargetPosition(lift.getCurrentPosition());
             lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift.setPower(0.1);
+            lift.setPower(-.5);
         }
 
-        if(opMode.gamepad2.b) {
-            right.setPosition(.8);
-            left.setPosition(.2);
-        }
+
         if(opMode.gamepad2.a) {
-            right.setPosition(1);
-            left.setPosition(0);
+                right.setPosition(1);
+                left.setPosition(0);
+
+        } if (opMode.gamepad2.b){
+            right.setPosition(.75);
+            left.setPosition(.25);
         }
     }
 

@@ -74,10 +74,10 @@ public class AutoMethods {
     }
 
     public void setMotorPower(double power) {
-        fl.setPower(power);
-        br.setPower(power);
-        fr.setPower(power);
-        bl.setPower(power);
+        fl.setPower(-power);
+        br.setPower(-power);
+        fr.setPower(-power);
+        bl.setPower(-power);
     }
 
     public void moveLift(double speed, int position) {
@@ -104,8 +104,8 @@ public class AutoMethods {
     public void Strafe(double speed, double ticks) {
         resetEncoder();
         while(Math.abs(encoderAVG()) < ticks) {
-            fl.setPower(speed);
-            bl.setPower(-speed);
+            fl.setPower(-speed);
+            bl.setPower(speed);
             fr.setPower(-speed);
             br.setPower(speed);
         }
@@ -160,7 +160,7 @@ public class AutoMethods {
     }
 
     public int encoderAVG() {
-        int avg = fl.getCurrentPosition() + fr.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition();
+        int avg = Math.abs(fl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition());
         return avg/4;
     }
 
