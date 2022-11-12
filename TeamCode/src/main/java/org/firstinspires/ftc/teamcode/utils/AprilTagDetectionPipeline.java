@@ -11,8 +11,6 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private final Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
-    private ArrayList<AprilTagDetection> detectionsUpdate = new ArrayList<>();
-    private final Object detectionsUpdateSync = new Object();
     public AprilTagDetectionPipeline() {
         nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
     }
@@ -29,22 +27,10 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
         detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, 0.166, 578.272, 578.272, 402.145, 221.506);
-
-        synchronized (detectionsUpdateSync) {
-            detectionsUpdate = detections;
-        }
         return input;
     }
 
     public ArrayList<AprilTagDetection> getLatestDetections() {
         return detections;
-    }
-
-    public ArrayList<AprilTagDetection> getDetectionsUpdate() {
-        synchronized (detectionsUpdateSync) {
-            ArrayList<AprilTagDetection> ret = detectionsUpdate;
-            detectionsUpdate = null;
-            return ret;
-        }
     }
 }

@@ -16,6 +16,7 @@ public class TeleLib {
     public Servo left;
 
     OpMode opMode;
+    public boolean isOpen = true;
 
     public TeleLib(OpMode opMode) {
         fl = opMode.hardwareMap.dcMotor.get("fl");
@@ -36,11 +37,12 @@ public class TeleLib {
 
         right = opMode.hardwareMap.servo.get("rightServo");
         left = opMode.hardwareMap.servo.get("leftServo");
-        right.setPosition(1);
-        left.setPosition(0);
+        right.setPosition(0);
+        left.setPosition(1);
 
         resetEncoders();
         resetLiftEncoder();
+
     }
 
     public void resetEncoders() {
@@ -65,8 +67,8 @@ public class TeleLib {
             double y = opMode.gamepad1.left_stick_y;
             double rx = -opMode.gamepad1.right_stick_x;
             double denom = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double FLP = (y + x + rx) / denom;
-            double BLP = (y - x + rx) / denom;
+            double FLP = (y - x + rx) / denom;
+            double BLP = (y + x + rx) / denom;
             double FRP = (y - x - rx) / denom;
             double BRP = (y + x - rx) / denom;
 
@@ -90,23 +92,35 @@ public class TeleLib {
         }
     }
     
-    public void lift(OpMode opMode) {
-        if(Math.abs(opMode.gamepad2.right_stick_y) > 0.1) {
-            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lift.setPower(opMode.gamepad2.right_stick_y*-.5);
+    public void lift(OpMode opMode) throws InterruptedException {
+        if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
+            if (opMode.gamepad2.right_trigger > .2) {
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                lift.setPower(opMode.gamepad2.left_stick_y * .5);
+            } else {
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                lift.setPower(opMode.gamepad2.left_stick_y);
+            }
         } else {
             lift.setTargetPosition(lift.getCurrentPosition());
             lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift.setPower(0.1);
+            lift.setPower(.5);
         }
 
-        if(opMode.gamepad2.b) {
-            right.setPosition(.8);
-            left.setPosition(.2);
-        }
-        if(opMode.gamepad2.a) {
-            right.setPosition(1);
-            left.setPosition(0);
+        if (opMode.gamepad2.a) {
+            if (isOpen) {
+                right.setPosition(1);
+                left.setPosition(0);
+            } else {
+                right.setPosition(.75);
+                left.setPosition(.25);
+            }
+            isOpen = !isOpen;
+            opMode.telemetry.addData("isOpen", isOpen);
+            opMode.telemetry.update();
+            while (opMode.gamepad2.a) {
+                Thread.sleep(100);
+            }
         }
     }
 
