@@ -16,7 +16,11 @@ public class MecTeleOp extends OpMode {
     @Override
     public void loop() {
         robot.drivetrain(this);
-        robot.lift(this);
+        try {
+            robot.lift(this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -16,7 +16,9 @@ public class TeleLib {
     public Servo left;
 
     OpMode opMode;
+
     boolean isOpen = false;
+
 
     public TeleLib(OpMode opMode) {
         fl = opMode.hardwareMap.dcMotor.get("fl");
@@ -37,11 +39,12 @@ public class TeleLib {
 
         right = opMode.hardwareMap.servo.get("rightServo");
         left = opMode.hardwareMap.servo.get("leftServo");
-        right.setPosition(1);
-        left.setPosition(0);
+        right.setPosition(0);
+        left.setPosition(1);
 
         resetEncoders();
         resetLiftEncoder();
+
     }
 
     public void resetEncoders() {
@@ -91,6 +94,7 @@ public class TeleLib {
         }
     }
     
+
     public void lift(OpMode opMode) {
         if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
             lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -109,6 +113,37 @@ public class TeleLib {
         } if (opMode.gamepad2.b){
             right.setPosition(.75);
             left.setPosition(.25);
+
+    public void lift(OpMode opMode) throws InterruptedException {
+        if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
+            if (opMode.gamepad2.right_trigger > .2) {
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                lift.setPower(opMode.gamepad2.left_stick_y * .5);
+            } else {
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                lift.setPower(opMode.gamepad2.left_stick_y);
+            }
+        } else {
+            lift.setTargetPosition(lift.getCurrentPosition());
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift.setPower(.5);
+        }
+
+        if (opMode.gamepad2.a) {
+            if (isOpen) {
+                right.setPosition(1);
+                left.setPosition(0);
+            } else {
+                right.setPosition(.75);
+                left.setPosition(.25);
+            }
+            isOpen = !isOpen;
+            opMode.telemetry.addData("isOpen", isOpen);
+            opMode.telemetry.update();
+            while (opMode.gamepad2.a) {
+                Thread.sleep(100);
+            }
+
         }
     }
 

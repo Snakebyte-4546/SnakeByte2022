@@ -17,8 +17,9 @@ public class ParkAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Camera Setup
+        // Camera/Robot Setup
         AutoMethods robot = new AutoMethods();
+        robot.ready(this);
         AprilTagDetectionPipeline aprilTagDetectionPipeline = robot.cameraSetup(this);
 
         while (!isStarted() && !isStopRequested()) {
@@ -47,8 +48,6 @@ public class ParkAuto extends LinearOpMode {
             }
             telemetry.update();
         }
-
-        robot.ready(this);
 
         waitForStart();
 

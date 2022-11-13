@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.utils.AprilTagDetectionPipeline;
@@ -9,7 +10,9 @@ import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Left Side Auto", group = "Auto")
+
+@Disabled
+@Autonomous(name = "Left Side Auto", group = "Score Auto")
 public class LeftSideScoreAuto extends LinearOpMode {
     int tagOfInterest = 0;
 

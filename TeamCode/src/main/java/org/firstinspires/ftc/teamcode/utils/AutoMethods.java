@@ -69,8 +69,8 @@ public class AutoMethods {
 
         right = auto.hardwareMap.servo.get("rightServo");
         left = auto.hardwareMap.servo.get("leftServo");
-        right.setPosition(1);
-        left.setPosition(0);
+        right.setPosition(0);
+        left.setPosition(1);
     }
 
     public void setMotorPower(double power) {
