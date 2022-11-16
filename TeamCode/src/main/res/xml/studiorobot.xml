@@ -7,6 +7,7 @@
             <Servo name="leftServo" port="1" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
+            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
             <RevRobotics20HDHexMotor name="br" port="0" />
             <RevRobotics20HDHexMotor name="fr" port="1" />
             <RevRobotics20HDHexMotor name="fl" port="2" />
