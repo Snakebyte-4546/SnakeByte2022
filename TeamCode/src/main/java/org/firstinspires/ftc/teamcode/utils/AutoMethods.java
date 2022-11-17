@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -28,6 +33,10 @@ public class AutoMethods {
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
+    ElapsedTime elapsedTime = new ElapsedTime();
+
+    public BNO055IMU imu;
+    Orientation angles;
 
 
     public AprilTagDetectionPipeline cameraSetup(LinearOpMode opMode) {
@@ -55,6 +64,14 @@ public class AutoMethods {
         return pipeline.getLatestDetections();
     }
 
+    public double getGyroYaw() {
+        updateGyroValues();
+        return angles.firstAngle;
+    }
+
+    public void updateGyroValues() {
+        angles = imu.getAngularOrientation();
+    }
     public void ready(LinearOpMode auto) {
         fl = auto.hardwareMap.dcMotor.get("fl");
         fr = auto.hardwareMap.dcMotor.get("fr");
@@ -71,6 +88,12 @@ public class AutoMethods {
         left = auto.hardwareMap.servo.get("leftServo");
         right.setPosition(0);
         left.setPosition(1);
+
+        BNO055IMU imu = auto.hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu.initialize(parameters);
+
     }
 
     public void setMotorPower(double power) {
@@ -122,6 +145,64 @@ public class AutoMethods {
             br.setPower(-power);
         }
         setMotorPower(0);
+    }
+
+
+
+    public void turnPID(double degree, double time, double power){
+        elapsedTime.reset();
+        double previousTime = elapsedTime.milliseconds();
+        double currentPosition = getGyroYaw();
+        double previousError = degree- currentPosition;
+        double plusMin = 0;
+        while(elapsedTime.milliseconds() < time ){
+            double currentTime = elapsedTime.milliseconds();
+            double currentError = degree-currentPosition;
+            double p = 1.1 * currentError;
+            double i = 0;
+            i += .8* (currentTime-previousTime);
+            double d = 1 * (currentError - previousError) / (currentTime - previousTime);
+            double speed = p + i + d;
+            plusMin = Math.signum((currentError));
+            fl.setPower(-plusMin * speed * power);
+            fr.setPower(plusMin * speed * power);
+            br.setPower(plusMin * speed * power);
+            bl.setPower(-plusMin * speed * power);
+            previousTime = currentTime;
+            previousError = currentError;
+        }
+        setMotorPower(0);
+    }
+
+    public void turnPDT(int tarDegree, double speed, double timeout)
+    {
+        double curDiff;
+        double startDiff = tarDegree - getGyroYaw();
+        double p = 0;
+        curDiff = startDiff;
+        double plusMin = 0;
+        elapsedTime.reset();
+        while(Math.abs(curDiff) > 1 && elapsedTime.milliseconds() < timeout)
+        {
+            curDiff = tarDegree - getGyroYaw();
+            double trueDiff = tarDegree - getGyroYaw();
+            int calc = Math.abs((int)(tarDegree - curDiff));
+            p = Math.abs(curDiff)/Math.abs(startDiff);
+            p = p * Math.signum(trueDiff);
+            plusMin = .1 * Math.signum(trueDiff);
+            bl.setPower(speed * p + plusMin);
+            fl.setPower(speed * p + plusMin);
+            br.setPower(speed * p + plusMin);
+            fr.setPower(speed * p + plusMin);
+            telemetry.addData("getGyrowyaw", getGyroYaw());
+            telemetry.addData("curdiff", curDiff);
+            telemetry.addData("startd", startDiff);
+            telemetry.update();
+        }
+        bl.setPower(0);
+        fl.setPower(0);
+        br.setPower(0);
+        fr.setPower(0);
     }
 
     public void clamp(boolean isOpen) {
