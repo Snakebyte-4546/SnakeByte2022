@@ -130,17 +130,9 @@ public class TeleLib {
 
     public void lift(OpMode opMode) throws InterruptedException {
         if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
-            if (opMode.gamepad2.right_trigger > .2) {
-                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                lift.setPower(opMode.gamepad2.left_stick_y * .5);
-            } else {
-                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                lift.setPower(opMode.gamepad2.left_stick_y);
-            }
+            lift.setPower(opMode.gamepad2.left_stick_y);
         } else {
-            lift.setTargetPosition(lift.getCurrentPosition());
-            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift.setPower(.5);
+            lift.setPower(-0.025);
         }
 
         if (opMode.gamepad2.a) {
@@ -148,8 +140,8 @@ public class TeleLib {
                 right.setPosition(1);
                 left.setPosition(0);
             } else {
-                right.setPosition(.75);
-                left.setPosition(.25);
+                right.setPosition(0);
+                left.setPosition(1);
             }
             isOpen = !isOpen;
             opMode.telemetry.addData("isOpen", isOpen);

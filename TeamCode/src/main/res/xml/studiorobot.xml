@@ -3,8 +3,8 @@
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
             <RevRobotics20HDHexMotor name="lift" port="0" />
-            <Servo name="rightServo" port="0" />
-            <Servo name="leftServo" port="1" />
+            <Servo name="rightServo" port="1" />
+            <Servo name="leftServo" port="2" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />

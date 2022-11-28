@@ -86,8 +86,7 @@ public class AutoMethods {
 
         right = auto.hardwareMap.servo.get("rightServo");
         left = auto.hardwareMap.servo.get("leftServo");
-        right.setPosition(0);
-        left.setPosition(1);
+        clamp(true);
 
         BNO055IMU imu = auto.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -103,7 +102,7 @@ public class AutoMethods {
         bl.setPower(-power);
     }
 
-    public void moveLift(double speed, int position) {
+    public void moveLift(double speed, double position) {
         if (position == 3) {
             ticks = 500;
         } else if (position == 2) {
@@ -207,8 +206,8 @@ public class AutoMethods {
 
     public void clamp(boolean isOpen) {
         if(!isOpen){
-            right.setPosition(.75);
-            left.setPosition(.25);
+            right.setPosition(0);
+            left.setPosition(1);
         } else {
             right.setPosition(1);
             left.setPosition(0);
