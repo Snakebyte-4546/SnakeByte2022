@@ -12,7 +12,7 @@ public class Test extends LinearOpMode {
         AutoMethods robot = new AutoMethods();
         robot.ready(this);
         waitForStart();
-        robot.moveLift(1,700);
+        robot.moveLift(1,"high");
         robot.lift.setPower(0.05);
         sleep(100);
         robot.MoveInchEncoder(-.8,950);

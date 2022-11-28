@@ -57,7 +57,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
             if(tagOfInterest == 1) {
                 robot.MoveInchEncoder(-.25,650);
                 robot.Strafe(.25, 1050);
-                robot.moveLift(.5, 1);
+                robot.moveLift(.5, "high");
                 sleep(200);
                 robot.MoveInchEncoder(.25, 60);
                 robot.clamp(false);
@@ -66,7 +66,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
                 robot.Strafe(-.25, 200);
             } else if(tagOfInterest == 2) {
                 robot.Strafe(.25, 400);
-                robot.moveLift(.5, 1);
+                robot.moveLift(.5, "high");
                 sleep(200);
                 robot.MoveInchEncoder(.25,60);
                 robot.clamp(true);
@@ -75,7 +75,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
                 robot.Strafe(.25, 250);
             } else if (tagOfInterest == 3) {
                 robot.Strafe(.25, 400);
-                robot.moveLift(.5, 1);
+                robot.moveLift(.5, "high");
                 sleep(200);
                 robot.MoveInchEncoder(.25,60);
                 robot.clamp(false);

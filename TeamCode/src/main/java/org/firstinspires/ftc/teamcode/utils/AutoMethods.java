@@ -102,14 +102,15 @@ public class AutoMethods {
         bl.setPower(-power);
     }
 
-    public void moveLift(double speed, double position) {
-        if (position == 3) {
-            ticks = 500;
-        } else if (position == 2) {
-            ticks = 400;
-        } else if (position == 1) {
-            ticks = 300;
-        }
+
+    public int getHeight(String code){
+        int returnHeight = 0;
+
+        return 1;
+    }
+
+    public void moveLift(double speed, String position) {
+        ticks = getHeight(position);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setTargetPosition(ticks);
         lift.setPower(speed);
