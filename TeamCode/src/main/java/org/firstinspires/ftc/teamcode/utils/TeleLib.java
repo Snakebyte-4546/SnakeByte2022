@@ -43,8 +43,8 @@ public class TeleLib {
 
         right = opMode.hardwareMap.servo.get("rightServo");
         left = opMode.hardwareMap.servo.get("leftServo");
-        right.setPosition(0);
-        left.setPosition(1);
+        right.setPosition(1);
+        left.setPosition(0);
 
         resetEncoders();
         resetLiftEncoder();
@@ -137,6 +137,7 @@ public class TeleLib {
                 lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 lift.setPower(opMode.gamepad2.left_stick_y);
             }
+
         } else {
             lift.setTargetPosition(lift.getCurrentPosition());
             lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);

@@ -12,15 +12,8 @@ public class Test extends LinearOpMode {
         AutoMethods robot = new AutoMethods();
         robot.ready(this);
         waitForStart();
-        robot.moveLift(1,"high");
-        robot.lift.setPower(0.05);
-        sleep(100);
-        robot.MoveInchEncoder(-.8,950);
-        robot.Strafe(.8, 3500);
-        //move lift and score
-        //lower lift
-        robot.Strafe(-.8, 500);
-        robot.MoveInchEncoder(-.8,1900);
+        robot.moveLift(0.5, "driving");
+        sleep(5000);
         //pick cone up for straight
         
         /*

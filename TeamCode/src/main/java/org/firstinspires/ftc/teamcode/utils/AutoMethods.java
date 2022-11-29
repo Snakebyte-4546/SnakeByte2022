@@ -105,15 +105,37 @@ public class AutoMethods {
 
     public int getHeight(String code){
         int returnHeight = 0;
-
-        return 1;
+        if(code.equals("high")){
+            returnHeight = 4960;
+        }
+        else if(code.equals("mid")){
+            returnHeight = 3480;
+        }
+        else if(code.equals("low")){
+            returnHeight = 2000;
+        }
+        else if(code.equals("driving")){
+            returnHeight = 800;
+        }
+        else if(code.equals("s5")){
+            returnHeight = 850;
+        } else if(code.equals("s4")){
+            returnHeight = 775;
+        } else if(code.equals("s3")){
+            returnHeight = 700;
+        } else if(code.equals("s2")){
+            returnHeight=625;
+        } else if(code.equals("s1")){
+            returnHeight=550;
+        }
+        return returnHeight;
     }
 
     public void moveLift(double speed, String position) {
         ticks = getHeight(position);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift.setTargetPosition(ticks);
-        lift.setPower(speed);
+        lift.setTargetPosition(-ticks);
+        lift.setPower(-speed);
     }
 
     public void MoveInchEncoder(double speed, double ticks) {
@@ -207,11 +229,11 @@ public class AutoMethods {
 
     public void clamp(boolean isOpen) {
         if(!isOpen){
-            right.setPosition(0);
-            left.setPosition(1);
-        } else {
             right.setPosition(1);
             left.setPosition(0);
+        } else {
+            right.setPosition(.5);
+            left.setPosition(.5);
         }
     }
 
