@@ -109,11 +109,11 @@ public class TeleLib {
 
         if (opMode.gamepad2.a) {
             if (isOpen) {
+                right.setPosition(0);
+                left.setPosition(1);
+            } else {
                 right.setPosition(1);
                 left.setPosition(0);
-            } else {
-                right.setPosition(.75);
-                left.setPosition(.25);
             }
             isOpen = !isOpen;
             opMode.telemetry.addData("isOpen", isOpen);

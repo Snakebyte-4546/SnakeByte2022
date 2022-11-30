@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.utils.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
@@ -11,7 +14,7 @@ import org.openftc.apriltag.AprilTagDetection;
 import java.util.ArrayList;
 
 
-@Disabled
+
 @Autonomous(name = "Left Side Auto", group = "Score Auto")
 public class LeftSideScoreAuto extends LinearOpMode {
     int tagOfInterest = 0;
@@ -50,39 +53,19 @@ public class LeftSideScoreAuto extends LinearOpMode {
         }
 
         robot.ready(this);
-
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Trajectory strafe1 = drive.trajectoryBuilder(new Pose2d())
+                .strafeRight(80)
+                .build();
         waitForStart();
-
+        drive.followTrajectory(strafe1);
         while(!isStopRequested() && opModeIsActive()){
             if(tagOfInterest == 1) {
-                robot.MoveInchEncoder(-.25,650);
-                robot.Strafe(.25, 1050);
-                robot.moveLift(.5, 1);
-                sleep(200);
-                robot.MoveInchEncoder(.25, 60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.25, 60);
-                robot.Strafe(-.25, 200);
+
             } else if(tagOfInterest == 2) {
-                robot.Strafe(.25, 400);
-                robot.moveLift(.5, 1);
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(true);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(.25, 250);
+
             } else if (tagOfInterest == 3) {
-                robot.Strafe(.25, 400);
-                robot.moveLift(.5, 1);
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(.25, 250);
-                robot.MoveInchEncoder(1, 650);
+
             } else {
                 telemetry.clearAll();
                 telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
