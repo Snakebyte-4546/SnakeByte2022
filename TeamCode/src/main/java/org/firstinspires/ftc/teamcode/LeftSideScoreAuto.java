@@ -3,20 +3,19 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.utils.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.utils.AutoMethods;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.util.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
 
-
 @Autonomous(name = "Left Side Auto", group = "Score Auto")
 public class LeftSideScoreAuto extends LinearOpMode {
+    Pose2d startPose = new Pose2d(-30, -60, 0);
     int tagOfInterest = 0;
 
     @Override
@@ -53,25 +52,42 @@ public class LeftSideScoreAuto extends LinearOpMode {
         }
 
         robot.ready(this);
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Trajectory strafe1 = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(80)
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
+        drive.setPoseEstimate(startPose);
+
+        Trajectory score = drive.trajectoryBuilder(startPose)
+                .splineToLinearHeading(new Pose2d(-12, 0, Math.toRadians(180)), Math.toRadians(85))
                 .build();
+
+        Trajectory tag3 = drive.trajectoryBuilder(score.end())
+                .strafeLeft(12)
+                .build();
+
+        Trajectory tag2 = drive.trajectoryBuilder(score.end())
+                .strafeLeft(12)
+                .forward(23)
+                .build();
+
+        Trajectory tag1 = drive.trajectoryBuilder(score.end())
+                .strafeLeft(12)
+                .forward(23)
+                .splineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(90)), Math.toRadians(0))
+                .build();
+
         waitForStart();
-        drive.followTrajectory(strafe1);
         while(!isStopRequested() && opModeIsActive()){
+            drive.followTrajectory(score);
             if(tagOfInterest == 1) {
-
+                drive.followTrajectory(tag1);
             } else if(tagOfInterest == 2) {
-
+                drive.followTrajectory(tag2);
             } else if (tagOfInterest == 3) {
-
+                drive.followTrajectory(tag3);
             } else {
                 telemetry.clearAll();
                 telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
                 telemetry.update();
             }
-            robot.setMotorPower(0);
         }
     }
 }
