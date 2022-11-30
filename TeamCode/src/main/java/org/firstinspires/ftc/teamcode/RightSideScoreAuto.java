@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
@@ -11,11 +13,9 @@ import org.openftc.apriltag.AprilTagDetection;
 import java.util.ArrayList;
 
 
-@Disabled
 @Autonomous(name = "Right Side Auto", group = "Score Auto")
 public class RightSideScoreAuto extends LinearOpMode {
-    AutoMethods robot = new AutoMethods();
-
+    Pose2d startPose = new Pose2d(30, -60, 180);
     int tagOfInterest = 0;
 
     @Override
@@ -26,6 +26,7 @@ public class RightSideScoreAuto extends LinearOpMode {
 
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = robot.getTag(aprilTagDetectionPipeline);
+
             if (currentDetections.size() != 0) {
                 boolean tagFound = false;
                 for (AprilTagDetection tag : currentDetections) {
@@ -51,45 +52,42 @@ public class RightSideScoreAuto extends LinearOpMode {
         }
 
         robot.ready(this);
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
+        drive.setPoseEstimate(startPose);
+
+        Trajectory score = drive.trajectoryBuilder(startPose)
+                .splineToLinearHeading(new Pose2d(12, 0, Math.toRadians(0)), Math.toRadians(85))
+                .build();
+
+        Trajectory tag3 = drive.trajectoryBuilder(score.end())
+                .strafeRight(12)
+                .build();
+
+        Trajectory tag2 = drive.trajectoryBuilder(score.end())
+                .strafeRight(12)
+                .forward(23)
+                .build();
+
+        Trajectory tag1 = drive.trajectoryBuilder(score.end())
+                .strafeRight(12)
+                .forward(44)
+                .build();
 
         waitForStart();
-
         while(!isStopRequested() && opModeIsActive()){
-            if(tagOfInterest == 1){
-                robot.MoveInchEncoder(-.25,650);
-                robot.Strafe(.25, 400);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25, 60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.25, 60);
-                robot.Strafe(.25,  250);
-            } else if(tagOfInterest == 2){
-                robot.Strafe(.25, 1050);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(.25,  250);
+            drive.followTrajectory(score);
+            //Do Claw Action Here
+            if(tagOfInterest == 1) {
+                drive.followTrajectory(tag1);
+            } else if(tagOfInterest == 2) {
+                drive.followTrajectory(tag2);
             } else if (tagOfInterest == 3) {
-                robot.Strafe(.25, 1050);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(-.25,  250);
-                robot.MoveInchEncoder(1, 650);
+                drive.followTrajectory(tag3);
             } else {
                 telemetry.clearAll();
                 telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
                 telemetry.update();
             }
-            robot.setMotorPower(0);
         }
     }
 }

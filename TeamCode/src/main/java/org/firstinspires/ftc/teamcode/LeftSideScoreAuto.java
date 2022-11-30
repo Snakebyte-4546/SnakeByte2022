@@ -70,13 +70,13 @@ public class LeftSideScoreAuto extends LinearOpMode {
 
         Trajectory tag1 = drive.trajectoryBuilder(score.end())
                 .strafeLeft(12)
-                .forward(23)
-                .splineToLinearHeading(new Pose2d(-55, -12, Math.toRadians(90)), Math.toRadians(0))
+                .forward(44)
                 .build();
 
         waitForStart();
         while(!isStopRequested() && opModeIsActive()){
             drive.followTrajectory(score);
+            //Do Claw Action Here
             if(tagOfInterest == 1) {
                 drive.followTrajectory(tag1);
             } else if(tagOfInterest == 2) {
