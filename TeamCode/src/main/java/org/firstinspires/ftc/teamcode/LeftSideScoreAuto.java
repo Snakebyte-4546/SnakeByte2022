@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
@@ -55,39 +58,18 @@ public class LeftSideScoreAuto extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
 
-        Trajectory score = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(-12, 0, Math.toRadians(180)), Math.toRadians(85))
-                .build();
-
-        Trajectory tag3 = drive.trajectoryBuilder(score.end())
-                .strafeLeft(12)
-                .build();
-
-        Trajectory tag2 = drive.trajectoryBuilder(score.end())
-                .strafeLeft(12)
-                .forward(23)
-                .build();
-
-        Trajectory tag1 = drive.trajectoryBuilder(score.end())
-                .strafeLeft(12)
-                .forward(44)
+        TrajectorySequence score = drive.trajectorySequenceBuilder(new Pose2d(-34, -61, 0))
+                .splineTo(new Vector2d(-13, -45), Math.toRadians(90))
+                .splineTo(new Vector2d(-13, -30), Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(-12.5, -0, Math.toRadians(-180)), Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(-12.5, -12, Math.toRadians(-180)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-15, -12, Math.toRadians(180)), Math.toRadians(180))
+                .lineTo(new Vector2d(-56, -12))
                 .build();
 
         waitForStart();
-        while(!isStopRequested() && opModeIsActive()){
-            drive.followTrajectory(score);
-            //Do Claw Action Here
-            if(tagOfInterest == 1) {
-                drive.followTrajectory(tag1);
-            } else if(tagOfInterest == 2) {
-                drive.followTrajectory(tag2);
-            } else if (tagOfInterest == 3) {
-                drive.followTrajectory(tag3);
-            } else {
-                telemetry.clearAll();
-                telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
-                telemetry.update();
-            }
+        if (!isStopRequested()){
+            drive.followTrajectorySequence(score);
         }
     }
 }
