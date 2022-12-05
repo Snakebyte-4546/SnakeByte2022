@@ -4,9 +4,14 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
@@ -14,6 +19,7 @@ import org.firstinspires.ftc.teamcode.util.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 @Autonomous(name = "Left Side Auto", group = "Score Auto")
@@ -59,12 +65,19 @@ public class LeftSideScoreAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence score = drive.trajectorySequenceBuilder(new Pose2d(-34, -61, 0))
-                .splineTo(new Vector2d(-13, -45), Math.toRadians(90))
-                .splineTo(new Vector2d(-13, -30), Math.toRadians(90))
-                .splineToSplineHeading(new Pose2d(-12.5, -0, Math.toRadians(-180)), Math.toRadians(90))
-                .splineToSplineHeading(new Pose2d(-12.5, -12, Math.toRadians(-180)), Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-15, -12, Math.toRadians(180)), Math.toRadians(180))
-                .lineTo(new Vector2d(-56, -12))
+                .splineTo(new Vector2d(-13, -45),
+                        Math.toRadians(90),
+                        MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineTo(new Vector2d(-13, -30),
+                        Math.toRadians(90),
+                        MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(-12.5, -0, Math.toRadians(-180)), Math.toRadians(90), MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(-12.5, -24, Math.toRadians(-180)), Math.toRadians(90), MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH), MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToLinearHeading(new Pose2d(-15, -24, Math.toRadians(180)), Math.toRadians(180), MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH), MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .lineTo(new Vector2d(-56, -24), MecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH), MecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         waitForStart();

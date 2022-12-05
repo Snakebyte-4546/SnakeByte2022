@@ -37,8 +37,7 @@ public class TeleLib {
 
         right = opMode.hardwareMap.servo.get("rightServo");
         left = opMode.hardwareMap.servo.get("leftServo");
-        right.setPosition(0);
-        left.setPosition(1);
+
 
         resetEncoders();
         resetLiftEncoder();
@@ -109,11 +108,11 @@ public class TeleLib {
 
         if (opMode.gamepad2.a) {
             if (isOpen) {
-                right.setPosition(0);
+                right.setPosition(0.5);
                 left.setPosition(1);
             } else {
                 right.setPosition(1);
-                left.setPosition(0);
+                left.setPosition(0.5);
             }
             isOpen = !isOpen;
             opMode.telemetry.addData("isOpen", isOpen);

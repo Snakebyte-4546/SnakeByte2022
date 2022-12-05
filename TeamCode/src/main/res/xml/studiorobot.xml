@@ -9,8 +9,8 @@
         <LynxModule name="Control Hub" port="173">
             <RevRobotics20HDHexMotor name="br" port="0" />
             <RevRobotics20HDHexMotor name="fr" port="1" />
-            <RevRobotics20HDHexMotor name="fl" port="2" />
-            <RevRobotics20HDHexMotor name="bl" port="3" />
+            <RevRobotics20HDHexMotor name="fl" port="3" />
+            <RevRobotics20HDHexMotor name="bl" port="2" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>
