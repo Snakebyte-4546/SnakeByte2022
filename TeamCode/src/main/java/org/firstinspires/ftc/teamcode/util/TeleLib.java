@@ -68,8 +68,8 @@ public class TeleLib {
             double denom = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double FLP = (y - x + rx) / denom;
             double BLP = (y + x + rx) / denom;
-            double FRP = (y - x - rx) / denom;
-            double BRP = (y + x - rx) / denom;
+            double FRP = (y + x - rx) / denom;
+            double BRP = (y - x - rx) / denom;
 
             if (opMode.gamepad1.right_trigger > 0.1) {
                 fl.setPower(FLP * .35);
