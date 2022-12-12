@@ -129,8 +129,8 @@ public class AutoMethods {
         while(Math.abs(encoderAVG()) < ticks) {
             fl.setPower(-speed);
             bl.setPower(speed);
-            fr.setPower(-speed);
-            br.setPower(speed);
+            fr.setPower(speed);
+            br.setPower(-speed);
         }
         setMotorPower(0);
     }
