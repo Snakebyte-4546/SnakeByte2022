@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.utils.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.utils.AutoMethods;
+import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.util.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;

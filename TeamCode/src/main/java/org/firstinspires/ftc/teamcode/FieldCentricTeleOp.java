@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.utils.TeleLib;
+import org.firstinspires.ftc.teamcode.util.TeleLib;
 
 @TeleOp(name = " Field Centric TeleOp", group = "TeleOp")
 public class FieldCentricTeleOp extends OpMode {

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.utils.AutoMethods;
+import org.firstinspires.ftc.teamcode.util.AutoMethods;
 
 @Autonomous(name = "StrafeTest")
 public class StrafeTest extends LinearOpMode {
