@@ -1,29 +1,27 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.util.AutoMethods;
+import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
 
-@Disabled
-@TeleOp(name = "April Tag Test", group = "Test")
-public class AprilTagTest extends LinearOpMode {
+@Autonomous(name = "Park Auto", group = "Auto")
+public class ParkAuto extends LinearOpMode {
     int tagOfInterest = 0;
 
     @Override
     public void runOpMode() {
-        // Camera Setup
-        AutoMethods robot = new AutoMethods();
-        AprilTagDetectionPipeline aprilTagDetectionPipeline = robot.cameraSetup(this);
+        // Camera/Robot Setup
+        AprilTags AprilTag = new AprilTags();
+        AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
 
         while (!isStarted() && !isStopRequested()) {
-            ArrayList<AprilTagDetection> currentDetections = robot.getTag(aprilTagDetectionPipeline);
+            ArrayList<AprilTagDetection> currentDetections = AprilTag.getTag(aprilTagDetectionPipeline);
 
             if (currentDetections.size() != 0) {
                 boolean tagFound = false;
@@ -48,5 +46,10 @@ public class AprilTagTest extends LinearOpMode {
             }
             telemetry.update();
         }
+
+        waitForStart();
+
+        //Roadrunner Stuff
     }
 }
+

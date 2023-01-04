@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.util.TeleLib;
+
+import org.firstinspires.ftc.teamcode.util.robot.TeleLib;
 
 @TeleOp(name = "TeleOp", group = "TeleOp")
-public class MecTeleOp extends OpMode {
+public class MecanumTeleOp extends OpMode {
     TeleLib robot;
 
     @Override
@@ -16,11 +17,20 @@ public class MecTeleOp extends OpMode {
     @Override
     public void loop() {
         robot.drivetrain(this);
+        robot.lift(this);
         try {
-            robot.lift(this);
+            robot.claw(this);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            telemetry.addData("ERROR: ", e);
+            telemetry.update();
         }
+        try {
+            robot.fourBar(this);
+        } catch (InterruptedException e) {
+            telemetry.addData("ERROR: ", e);
+            telemetry.update();
+        }
+
     }
 
     @Override

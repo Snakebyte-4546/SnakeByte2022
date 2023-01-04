@@ -1,30 +1,28 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.util.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.util.AutoMethods;
+import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
 
-@Autonomous(name = "Park Auto", group = "Auto")
-public class ParkAuto extends LinearOpMode {
-
+@Autonomous(name = "Right Side Auto", group = "Score Auto")
+public class RightSideScoreAuto extends LinearOpMode {
     int tagOfInterest = 0;
 
     @Override
     public void runOpMode() {
-        // Camera/Robot Setup
-        AutoMethods robot = new AutoMethods();
-        robot.ready(this);
-        AprilTagDetectionPipeline aprilTagDetectionPipeline = robot.cameraSetup(this);
+        // Camera Setup
+        AprilTags AprilTag = new AprilTags();
+        AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
 
         while (!isStarted() && !isStopRequested()) {
-            ArrayList<AprilTagDetection> currentDetections = robot.getTag(aprilTagDetectionPipeline);
-
+            ArrayList<AprilTagDetection> currentDetections = AprilTag.getTag(aprilTagDetectionPipeline);
             if (currentDetections.size() != 0) {
                 boolean tagFound = false;
                 for (AprilTagDetection tag : currentDetections) {
@@ -51,20 +49,7 @@ public class ParkAuto extends LinearOpMode {
 
         waitForStart();
 
-        if(tagOfInterest == 1) {
-                robot.MoveInchEncoder(-1,950);
-                robot.Strafe(1, 1800);
-            } else if(tagOfInterest == 2) {
-            robot.MoveInchEncoder(-1,75);
-            robot.Strafe(1, 1800);
-            } else if (tagOfInterest == 3) {
-            robot.MoveInchEncoder(1,900);
-            robot.Strafe(1, 1800);
-            } else {
-                telemetry.clearAll();
-                telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
-                telemetry.update();
-            }
+        //Roadrunner Stuff
     }
 }
 
