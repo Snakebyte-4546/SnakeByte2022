@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.openftc.apriltag.AprilTagDetection;
@@ -13,10 +16,28 @@ import java.util.ArrayList;
 @Autonomous(name = "Park Auto", group = "Auto")
 public class ParkAuto extends LinearOpMode {
     int tagOfInterest = 0;
-
     @Override
     public void runOpMode() {
-        // Camera/Robot Setup
+        //Roadrunner Setup
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence park1 = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
+                .build();
+
+        TrajectorySequence park2 = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-58, -11, Math.toRadians(180)))
+                .build();
+
+        TrajectorySequence park3 = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-12, -11, Math.toRadians(180)))
+                .build();
+        // Camera Setup
         AprilTags AprilTag = new AprilTags();
         AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
 
@@ -48,8 +69,13 @@ public class ParkAuto extends LinearOpMode {
         }
 
         waitForStart();
-
-        //Roadrunner Stuff
+        if(tagOfInterest == 1) {
+            drive.followTrajectorySequence(park1);
+        } else if(tagOfInterest == 2) {
+            drive.followTrajectorySequence(park2);
+        } else if(tagOfInterest == 3) {
+            drive.followTrajectorySequence(park3);
+        }
     }
 }
 

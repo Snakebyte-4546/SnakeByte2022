@@ -25,9 +25,16 @@ public class LeftSideScoreAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence path = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)), Math.toRadians(90))
 
+                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
+                .addDisplacementMarker(() -> {
+                    //lift to high goal and 4bar to vertical position
+                })
+                .splineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)), Math.toRadians(90))
+                .addDisplacementMarker(() -> {
+                    //move 4bar and drop cone
+                    //move 4bar back to vertical position and lower lift
+                })
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
@@ -79,18 +86,14 @@ public class LeftSideScoreAuto extends LinearOpMode {
 
         waitForStart();
 
-        while (!isStopRequested()) {
-            drive.followTrajectorySequence(path);
-            if(tagOfInterest == 1){
-                drive.followTrajectorySequence(park1);
-            } else if(tagOfInterest == 2){
-                drive.followTrajectorySequence(park2);
-            } else if(tagOfInterest == 3){
-                drive.followTrajectorySequence(park3);
-            }
+        drive.followTrajectorySequence(path);
+        if(tagOfInterest == 1){
+            drive.followTrajectorySequence(park1);
+        } else if(tagOfInterest == 2){
+            drive.followTrajectorySequence(park2);
+        } else if(tagOfInterest == 3){
+            drive.followTrajectorySequence(park3);
         }
-
-
     }
 }
 
