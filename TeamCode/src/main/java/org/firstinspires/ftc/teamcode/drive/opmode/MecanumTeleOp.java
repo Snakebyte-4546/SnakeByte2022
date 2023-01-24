@@ -24,12 +24,8 @@ public class MecanumTeleOp extends OpMode {
             telemetry.addData("ERROR: ", e);
             telemetry.update();
         }
-        try {
-            robot.fourBar(this);
-        } catch (InterruptedException e) {
-            telemetry.addData("ERROR: ", e);
-            telemetry.update();
-        }
+         robot.fourBar(this);
+
 
     }
 

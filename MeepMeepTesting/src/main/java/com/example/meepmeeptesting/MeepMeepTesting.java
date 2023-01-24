@@ -23,28 +23,24 @@ public class MeepMeepTesting {
 
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                                     .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                                    //.lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
+                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
 
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                                     .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
 
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                                     .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
 
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                                     .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
 
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                                     .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
 
                                     //park
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))

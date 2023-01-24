@@ -4,14 +4,15 @@
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
             <RevRobotics20HDHexMotor name="lift" port="1" />
+            <RevRobotics20HDHexMotor name="lift2" port="2"/>
             <Servo name="claw" port="1" />
-            <Servo name="4bar" port="0" />
+            <RevRoboticsCoreHexMotor name="4bar" port="0" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <RevRobotics20HDHexMotor name="bl" port="0" />
-            <RevRobotics20HDHexMotor name="br" port="1" />
+            <RevRobotics20HDHexMotor name="fr" port="1" />
             <RevRobotics20HDHexMotor name="fl" port="2" />
-            <RevRobotics20HDHexMotor name="fr" port="3" />
+            <RevRobotics20HDHexMotor name="br" port="3" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>

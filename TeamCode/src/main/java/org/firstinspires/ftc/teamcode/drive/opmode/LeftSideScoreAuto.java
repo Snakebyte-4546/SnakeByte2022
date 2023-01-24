@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
+import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ public class LeftSideScoreAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Roadrunner Setup
+        AutoMethods robot = new AutoMethods();
+        robot.ready(this);
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -28,17 +31,27 @@ public class LeftSideScoreAuto extends LinearOpMode {
 
                 .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
                 .addDisplacementMarker(() -> {
-                    //lift to high goal and 4bar to vertical position
+                    robot.moveLift(1, 4000);
+                    robot.moveFourBar(280);
                 })
                 .splineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
-                    //move 4bar and drop cone
-                    //move 4bar back to vertical position and lower lift
+                    robot.claw(false);
+                    robot.moveFourBar(0);
+                    robot.moveLift(1,240);
                 })
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
+                .addDisplacementMarker(() ->{
+                    robot.claw(true);
+                })
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, 4000);
+                    robot.moveFourBar(640);
+                    robot.claw(false);
+                })
                 .build();
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(path.end())
