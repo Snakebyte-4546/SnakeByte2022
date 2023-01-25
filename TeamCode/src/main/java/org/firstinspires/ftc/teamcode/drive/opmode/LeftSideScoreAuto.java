@@ -98,7 +98,8 @@ public class LeftSideScoreAuto extends LinearOpMode {
         }
 
         waitForStart();
-
+        robot.MoveInchEncoder(1,4000);
+        /*
         drive.followTrajectorySequence(path);
         if(tagOfInterest == 1){
             drive.followTrajectorySequence(park1);
@@ -106,7 +107,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
             drive.followTrajectorySequence(park2);
         } else if(tagOfInterest == 3){
             drive.followTrajectorySequence(park3);
-        }
+        }*/
     }
 }
 

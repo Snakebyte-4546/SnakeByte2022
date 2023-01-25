@@ -16,6 +16,6 @@ public class Test extends OpMode{
 
     @Override
     public void loop() {
-        telemetry.addData("fourBarPos", robot.fourbar.getCurrentPosition());
+
     }
 }

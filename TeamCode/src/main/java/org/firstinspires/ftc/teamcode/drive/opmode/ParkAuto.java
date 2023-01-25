@@ -69,13 +69,15 @@ public class ParkAuto extends LinearOpMode {
         }
 
         waitForStart();
+
+        /*
         if(tagOfInterest == 1) {
             drive.followTrajectorySequence(park1);
         } else if(tagOfInterest == 2) {
             drive.followTrajectorySequence(park2);
         } else if(tagOfInterest == 3) {
             drive.followTrajectorySequence(park3);
-        }
+        }*/
     }
 }
 

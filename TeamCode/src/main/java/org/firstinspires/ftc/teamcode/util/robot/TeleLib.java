@@ -77,8 +77,8 @@ public class TeleLib {
                 frontorBack = !frontorBack;
                 multiplier *= -1;
             }
-            double FLP = (y - x + rx) / max * multiplier;
-            double BLP = (y + x + rx) / max * multiplier;
+            double FLP = (y + x + rx) / max * multiplier;
+            double BLP = (y - x + rx) / max * multiplier;
             double FRP = (y + x - rx) / max * multiplier;
             double BRP = (y - x - rx) / max * multiplier;
             if (opMode.gamepad1.right_trigger > 0.1) {
