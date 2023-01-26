@@ -77,8 +77,8 @@ public class TeleLib {
                 frontorBack = !frontorBack;
                 multiplier *= -1;
             }
-            double FLP = (y + x + rx) / max * multiplier;
-            double BLP = (y - x + rx) / max * multiplier;
+            double FLP = (y - x + rx) / max * multiplier;
+            double BLP = (y + x + rx) / max * multiplier;
             double FRP = (y + x - rx) / max * multiplier;
             double BRP = (y - x - rx) / max * multiplier;
             if (opMode.gamepad1.right_trigger > 0.1) {
@@ -165,7 +165,22 @@ public class TeleLib {
             }
             liftPos = lift.getCurrentPosition();
             lift2Pos = lift2.getCurrentPosition();
-        } else {
+        } else if(opMode.gamepad2.a) {
+            lift.setTargetPosition(-4000);
+            lift2.setTargetPosition(-4000);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setPower(1);
+            lift.setPower(1);
+        } else if(opMode.gamepad2.b){
+            lift.setTargetPosition(-1800);
+            lift2.setTargetPosition(-1800);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setPower(1);
+            lift.setPower(1);
+        }
+        else{
             lift.setTargetPosition(liftPos);
             lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             lift.setPower(liftPower);
@@ -180,10 +195,15 @@ public class TeleLib {
             fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fourbar.setPower(opMode.gamepad2.left_stick_y);
         } else if(opMode.gamepad2.y){
-            fourbar.setTargetPosition(-40);
+            fourbar.setTargetPosition(700);
             fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             fourbar.setPower(1);
-        } else {
+        } else if(opMode.gamepad2.x){
+            fourbar.setTargetPosition(1000);
+            fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            fourbar.setPower(1);
+        }
+        else {
             fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fourbar.setPower(0);
         }
