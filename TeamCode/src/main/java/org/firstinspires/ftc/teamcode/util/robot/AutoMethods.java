@@ -34,6 +34,8 @@ public class AutoMethods {
 
     int ticks = 0;
     double tickstodegs = 5;
+    public double fourbarPower = .6;
+    public int fBPos = 0;
 
     public Servo claw;
 
@@ -85,9 +87,10 @@ public class AutoMethods {
 
 
         claw = auto.hardwareMap.servo.get("claw");
-        claw(true);
+        claw(false);
 
         fourBar = auto.hardwareMap.dcMotor.get("4bar");
+        fourBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fourBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         resetLiftEncoder();
 
@@ -113,6 +116,34 @@ public class AutoMethods {
         bl.setPower(power);
     }
 
+    public void setFourBar(int position) {
+        switch(position) {
+            case 0: {
+                fourBar.setTargetPosition(0);
+                fourBar.setPower(fourbarPower);
+                fBPos = 1;
+                break;
+            }
+            case 1: {
+                fourBar.setTargetPosition(400);
+                fourBar.setPower(fourbarPower);
+                fBPos= 2;
+                break;
+            }
+            case 2: {
+                fourBar.setTargetPosition(680);
+                fourBar.setPower(fourbarPower);
+                fBPos = 3;
+                break;
+            }
+            case 3: {
+                fourBar.setTargetPosition(960);
+                fourBar.setPower(fourbarPower);
+                fBPos = 4;
+                break;
+            }
+        }
+    }
 
     public int getHeight(String code){
         int returnHeight = 0;
@@ -185,10 +216,10 @@ public class AutoMethods {
 
     public void claw(boolean isOpen) {
         if(!isOpen){
-            claw.setPosition(1);
+            claw.setPosition(0);
 
         } else {
-            claw.setPosition(0);
+            claw.setPosition(1);
         }
     }
 

@@ -6,7 +6,7 @@
             <RevRobotics20HDHexMotor name="lift" port="1" />
             <RevRobotics20HDHexMotor name="lift2" port="2"/>
             <Servo name="claw" port="1" />
-            <RevRoboticsCoreHexMotor name="4bar" port="0" />
+            <RevRoboticsCoreHexMotor name="4bar" port="3" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <RevRobotics20HDHexMotor name="fl" port="0" />

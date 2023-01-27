@@ -62,7 +62,6 @@ public class TeleLib {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
-        setFourBar(4);
         claw.setPosition(clawClose);
     }
 
@@ -108,7 +107,10 @@ public class TeleLib {
     public void mechanism(OpMode opMode){
         lift(opMode);
         fourBar(opMode);
-        fourBarPID(-177);
+    }
+
+    public int fbPos(){
+        return fourbar.getCurrentPosition();
     }
 
     public void FieldCentricDriveTrain(OpMode opMode) {
@@ -233,34 +235,29 @@ public class TeleLib {
 
     public void setFourBar(int position) {
         switch(position) {
-            case 1: {
+            case 0: {
                 fourbar.setTargetPosition(0);
                 fourbar.setPower(fourbarPower);
                 fBPos = 1;
                 break;
             }
-            case 2: {
-                fourbar.setTargetPosition(0);
+            case 1: {
+                fourbar.setTargetPosition(400);
                 fourbar.setPower(fourbarPower);
                 fBPos= 2;
                 break;
             }
-            case 3: {
-                fourbar.setTargetPosition(0);
+            case 2: {
+                fourbar.setTargetPosition(680);
                 fourbar.setPower(fourbarPower);
                 fBPos = 3;
                 break;
             }
-            case 4: {
-                fourbar.setTargetPosition(0);
+            case 3: {
+                fourbar.setTargetPosition(960);
                 fourbar.setPower(fourbarPower);
                 fBPos = 4;
                 break;
-            }
-            case 5: {
-                fourbar.setTargetPosition(0);
-                fourbar.setPower(fourbarPower);
-                fBPos = 5;
             }
         }
     }

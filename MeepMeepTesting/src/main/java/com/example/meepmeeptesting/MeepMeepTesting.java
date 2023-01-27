@@ -19,33 +19,23 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive -> {
                             return drive.trajectorySequenceBuilder(new Pose2d(-35, -64, Math.toRadians(90)))
                                     .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
-                                    .splineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)), Math.toRadians(90))
-
+                                    .addDisplacementMarker(() -> {
+                                        //do shit
+                                    })
+                                    .lineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)))
+                                    .addDisplacementMarker(() -> {
+                                        //more shit
+                                    })
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    //.lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
-
+                                    .lineToLinearHeading(new Pose2d(-60, -12, Math.toRadians(180)))
+                                    .addDisplacementMarker(() ->{
+                                        //even more shit
+                                    })
                                     .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
-
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
-
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
-
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-27, -9, Math.toRadians(240)))
-
-                                    //park
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-58, -11, Math.toRadians(180)))
-                                    .lineToLinearHeading(new Pose2d(-12, -11, Math.toRadians(180)))
+                                    .lineToLinearHeading(new Pose2d(-28, -6, Math.toRadians(235)))
+                                    .addDisplacementMarker(() -> {
+                                        //who would have guessed, more shit!
+                                    })
                                     .build();
                         }
                 );

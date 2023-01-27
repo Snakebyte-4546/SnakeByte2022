@@ -28,28 +28,31 @@ public class LeftSideScoreAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence path = drive.trajectorySequenceBuilder(startPose)
-
-                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
                 .addDisplacementMarker(() -> {
                     robot.moveLift(1, 4000);
-                    robot.moveFourBar(280);
+                    robot.setFourBar(1);
+                    robot.claw(true);
                 })
-                .splineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)), Math.toRadians(90))
+                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
                 .addDisplacementMarker(() -> {
-                    robot.claw(false);
-                    robot.moveFourBar(0);
+                    robot.claw(true);
+                })
+                .lineToLinearHeading(new Pose2d(-23.5, -10, Math.toRadians(90)))
+                .addDisplacementMarker(() -> {
+                    //robot.claw(true);
+                    robot.setFourBar(0);
                     robot.moveLift(1,240);
                 })
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-58, -12, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-60, -12, Math.toRadians(180)))
                 .addDisplacementMarker(() ->{
                     robot.claw(true);
                 })
                 .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(230)))
+                .lineToLinearHeading(new Pose2d(-26, -4, Math.toRadians(235)))
                 .addDisplacementMarker(() -> {
                     robot.moveLift(1, 4000);
-                    robot.moveFourBar(640);
+                    robot.setFourBar(3);
                     robot.claw(false);
                 })
                 .build();
@@ -67,6 +70,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
                 .build();
 
         // Camera Setup
+        /*
         AprilTags AprilTag = new AprilTags();
         AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
 
@@ -96,11 +100,13 @@ public class LeftSideScoreAuto extends LinearOpMode {
             }
             telemetry.update();
         }
-
+         */
+        robot.claw(false);
         waitForStart();
-        robot.MoveInchEncoder(1,4000);
+        drive.followTrajectorySequence(path);
         /*
         drive.followTrajectorySequence(path);
+        
         if(tagOfInterest == 1){
             drive.followTrajectorySequence(park1);
         } else if(tagOfInterest == 2){
