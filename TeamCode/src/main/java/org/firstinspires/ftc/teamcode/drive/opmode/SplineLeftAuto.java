@@ -37,14 +37,13 @@ public class SplineLeftAuto extends LinearOpMode {
                 .addDisplacementMarker(() -> {
                     scorePrime();
                 })
-                .splineToSplineHeading(new Pose2d(-29, -5, Math.toRadians(220)), Math.toRadians(62))
+                .strafeTo(new Vector2d(-35, -10.2))
+                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-28.5, -4.5))
                 .build();
 
         TrajectorySequence conePickup = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .addDisplacementMarker(() -> {
-                    rest();
-                })
-                .splineToSplineHeading(pickupPose, Math.toRadians(180))
+                .strafeTo(new Vector2d(-60, -12))
                 .build();
 
         TrajectorySequence coneScore = drive.trajectorySequenceBuilder(conePickup.end())
@@ -55,16 +54,20 @@ public class SplineLeftAuto extends LinearOpMode {
                 .build();
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(coneScore.end())
-                .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
+                .strafeTo(new Vector2d(-36, -12))
+                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-58, -12))
                 .build();
 
         TrajectorySequence park2 = drive.trajectorySequenceBuilder(coneScore.end())
-                .splineToSplineHeading(new Pose2d(-58, -11, Math.toRadians(180)), Math.toRadians(180))
+                .strafeTo(new Vector2d(-36, -12))
+                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
                 .build();
 
         TrajectorySequence park3 = drive.trajectorySequenceBuilder(coneScore.end())
-                .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                .strafeTo(new Vector2d(-12, -11))
+                .strafeTo(new Vector2d(-35, -12))
+                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-12, -12))
                 .build();
 
 
@@ -86,6 +89,7 @@ public class SplineLeftAuto extends LinearOpMode {
                         break;
                     }
                 }
+
                 if (tagFound) {
                     telemetry.addData("Tag Found:", tagOfInterest);
                 }
@@ -98,22 +102,24 @@ public class SplineLeftAuto extends LinearOpMode {
                     telemetry.addLine("\nBut the tag has been seen before, Tag ID: " + tagOfInterest);
                 }
             }
+            telemetry.addData("Fourbar Position:", robot.fourBar.getCurrentPosition());
+            telemetry.addData("Claw Position:", robot.claw.getPosition());
             telemetry.update();
         }
 
         waitForStart();
 
-        scorePrime();
+
         drive.followTrajectorySequence(preloadToGoal);
         score();
+        sleep(500);
+        robot.claw(false);
 
         scorePrime();
-        drive.followTrajectorySequence(conePickup);
-        robot.claw(false);
-        drive.followTrajectorySequence(coneScore);
-        score();
-        scorePrime();
+        sleep(750);
         rest();
+        robot.claw(false);
+        sleep(250);
 
         if(tagOfInterest == 1){
             drive.followTrajectorySequence(park1);
@@ -126,16 +132,18 @@ public class SplineLeftAuto extends LinearOpMode {
 
     private void scorePrime() {
         robot.moveLift(1, 4000);
-        robot.moveFourBar(680);}
+        robot.moveFourBar(660);}
 
     private void score() {
-        robot.moveFourBar(0);
-        robot.moveFourBar(680);
-        robot.claw(true);}
+        robot.moveLift(1, 4000);
+        robot.moveFourBar(1000);
+        sleep(300);
+        robot.claw(true);
+        sleep(500);}
 
         private void rest() {
+            robot.moveLift(1, 0);
             robot.moveFourBar(0);
-            robot.moveLift(1, 240);
             robot.claw(true);
 
         }

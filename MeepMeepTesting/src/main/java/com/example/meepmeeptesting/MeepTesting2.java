@@ -11,34 +11,31 @@ public class MeepTesting2 {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(900);
 
-
+        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         Pose2d scorePose= new Pose2d(-29, -5, Math.toRadians(220));
         Pose2d pickupPose = new Pose2d(-60, -12, Math.toRadians(180));
 
 
         RoadRunnerBotEntity path = new DefaultBotBuilder(meepMeep)
         // Set bot constraints: maxVel     maxAccel     maxAngVel            maxAngAccel          track width
-                .setConstraints(55, 45, Math.toRadians(305), Math.toRadians(250), 9.5)
+                .setConstraints(35, 20, Math.toRadians(100), Math.toRadians(250), 9.5)
                 .setDimensions(12.87    , 12)
                 .followTrajectorySequence(drive -> {
-                            return drive.trajectorySequenceBuilder(new Pose2d(-35, -64, Math.toRadians(90)))
-
-                                    //drop off first cone
-                                    .addDisplacementMarker(() -> {
-                                        //moveLift(1, 4000);
-                                        //moveFourBar(280);
-                                    })
-                                    .splineToSplineHeading(new Pose2d(-29, -5, Math.toRadians(220)), Math.toRadians(62))
-                                    .forward(.001) //added to simulate robot doing something
+                            return drive.trajectorySequenceBuilder(startPose)
 
 
-                                    .splineToSplineHeading(pickupPose, Math.toRadians(180))
-                                    .back(.001) //added to simulate robot doing something
-                                    .splineToSplineHeading(scorePose, Math.toRadians(40))
-                                    .forward(.001)
+                                    // preloadToGoal
+                                    .strafeTo(new Vector2d(-35, -10.2))
+                                    .turn(Math.toRadians(140), Math.toRadians(80), Math.toRadians(150))
+                                    .strafeTo(new Vector2d(-28.5, -4.5))
 
-                                    .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
-                                    .strafeTo(new Vector2d(-12, -11))
+                                    // score1
+                                    .strafeTo(new Vector2d(-36, -12))
+                                    .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
+                                    .strafeTo(new Vector2d(-58, -12))
+
+                                    //.strafeTo(new Vector2d(-36, -12))
+                                    //.turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
                                     .build();
                         }
                 );
@@ -82,7 +79,7 @@ public class MeepTesting2 {
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(movementTest) //  path | drift | movementTest
+                .addEntity(path) //  path | drift | movementTest
                 .start();
     }
 }

@@ -176,6 +176,10 @@ public class AutoMethods {
         return returnHeight;
     }
 
+
+    // Lift positions and values
+    //  rest | up | score
+    //       |    |
     public void moveLift(double speed, int position) {
         int ticks = position;
         lift.setTargetPosition(-ticks);
