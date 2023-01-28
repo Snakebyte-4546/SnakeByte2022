@@ -26,12 +26,12 @@ public class MeepTesting2 {
 
                                     // preloadToGoal
                                     .strafeTo(new Vector2d(-35, -10.2))
-                                    .turn(Math.toRadians(140), Math.toRadians(80), Math.toRadians(150))
+                                    .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
                                     .strafeTo(new Vector2d(-28.5, -4.5))
 
                                     // score1
                                     .strafeTo(new Vector2d(-36, -12))
-                                    .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
+                                    .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
                                     .strafeTo(new Vector2d(-58, -12))
 
                                     //.strafeTo(new Vector2d(-36, -12))

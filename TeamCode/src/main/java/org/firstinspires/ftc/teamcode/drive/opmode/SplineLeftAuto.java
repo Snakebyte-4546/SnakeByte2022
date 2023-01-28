@@ -55,8 +55,8 @@ public class SplineLeftAuto extends LinearOpMode {
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(coneScore.end())
                 .strafeTo(new Vector2d(-36, -12))
-                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-58, -12))
+                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-28.5, -12))
                 .build();
 
         TrajectorySequence park2 = drive.trajectorySequenceBuilder(coneScore.end())
@@ -65,7 +65,7 @@ public class SplineLeftAuto extends LinearOpMode {
                 .build();
 
         TrajectorySequence park3 = drive.trajectorySequenceBuilder(coneScore.end())
-                .strafeTo(new Vector2d(-35, -12))
+                .strafeTo(new Vector2d(-36, -12))
                 .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
                 .strafeTo(new Vector2d(-12, -12))
                 .build();
@@ -76,6 +76,7 @@ public class SplineLeftAuto extends LinearOpMode {
         // Camera Setup
         AprilTags AprilTag = new AprilTags();
         AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
+
 
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = AprilTag.getTag(aprilTagDetectionPipeline);
@@ -99,7 +100,7 @@ public class SplineLeftAuto extends LinearOpMode {
                 if (tagOfInterest == 0) {
                     telemetry.addLine("(no tags have been seen)");
                 } else {
-                    telemetry.addLine("\nBut the tag has been seen before, Tag ID: " + tagOfInterest);
+                    telemetry.addLine("\nBut tag has been saved, Tag ID: " + tagOfInterest);
                 }
             }
             telemetry.addData("Fourbar Position:", robot.fourBar.getCurrentPosition());
