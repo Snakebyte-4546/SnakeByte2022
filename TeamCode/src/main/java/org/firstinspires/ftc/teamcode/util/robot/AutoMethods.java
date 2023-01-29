@@ -30,6 +30,8 @@ public class AutoMethods {
     public DcMotor br;
     public DcMotor lift;
 
+    public DcMotor lift2;
+
     public DcMotor fourBar;
 
     int ticks = 0;
@@ -83,6 +85,7 @@ public class AutoMethods {
         resetEncoder();
 
         lift = auto.hardwareMap.dcMotor.get("lift");
+        lift2 = auto.hardwareMap.dcMotor.get("lift2");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
@@ -185,6 +188,10 @@ public class AutoMethods {
         lift.setTargetPosition(-ticks);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setPower(-speed);
+
+        lift2.setTargetPosition(-ticks);
+        lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift2.setPower(-speed);
     }
 
     public void MoveInchEncoder(double speed, double ticks) {
@@ -285,6 +292,8 @@ public class AutoMethods {
         fourBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fourBar.setPower(1);
     }
+
+
 
 }
 

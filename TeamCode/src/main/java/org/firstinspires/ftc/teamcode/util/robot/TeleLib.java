@@ -32,9 +32,9 @@ public class TeleLib {
     public boolean frontorBack = true;
 
     public TeleLib(OpMode opMode) {
-        fl = opMode.hardwareMap.dcMotor.get("fl");
+        fl = opMode.hardwareMap.dcMotor.get("bl");
         fr = opMode.hardwareMap.dcMotor.get("fr");
-        bl = opMode.hardwareMap.dcMotor.get("bl");
+        bl = opMode.hardwareMap.dcMotor.get("fl");
         br = opMode.hardwareMap.dcMotor.get("br");
         lift = opMode.hardwareMap.dcMotor.get("lift");
         lift2 = opMode.hardwareMap.dcMotor.get("lift2");

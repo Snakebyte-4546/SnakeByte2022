@@ -33,16 +33,16 @@ public class LowLeftScoreAuto extends LinearOpMode {
                 .lineTo((new Vector2d(-51,-29)))
                 .build();
         TrajectorySequence backUp = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .lineTo(new Vector2d(-51,-40))
+                .lineTo(new Vector2d(-51,-36))
                 .build();
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(backUp.end())
-                .lineTo(new Vector2d(-64,-40))
+                .lineTo(new Vector2d(-60,-36))
                 .build();
         TrajectorySequence park2 = drive.trajectorySequenceBuilder(backUp.end())
-                .lineTo(new Vector2d(-35,-40))
+                .lineTo(new Vector2d(-36, -36))
                 .build();
         TrajectorySequence park3 = drive.trajectorySequenceBuilder(backUp.end())
-                .lineTo(new Vector2d(-10,-40))
+                .lineTo(new Vector2d(-12,-36))
                 .build();
 
         AprilTags AprilTag = new AprilTags();

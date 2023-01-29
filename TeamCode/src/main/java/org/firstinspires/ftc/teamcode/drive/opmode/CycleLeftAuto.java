@@ -13,8 +13,9 @@ import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
-@Autonomous(name = "Spline Left Auto", group = "Score Auto")
-public class SplineLeftAuto extends LinearOpMode {
+
+@Autonomous(name = "Cycle Auto Left", group = "Score Auto")
+public class CycleLeftAuto extends LinearOpMode {
 
     int tagOfInterest = 0;
     AutoMethods robot = new AutoMethods();
@@ -27,13 +28,16 @@ public class SplineLeftAuto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
-        Pose2d scorePose= new Pose2d(-29, -5, Math.toRadians(220));
+        Pose2d highPose = new Pose2d(-29, -5, Math.toRadians(220));
         Pose2d pickupPose = new Pose2d(-60, -12, Math.toRadians(180));
+        Pose2d nuteralPose = new Pose2d(-60, -12, Math.toRadians(180));
         drive.setPoseEstimate(startPose);
+
+        //
 
 
         // Trajectory setup
-        TrajectorySequence preloadToGoal = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence startToHigh = drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
                     prime();
                 })
@@ -42,36 +46,42 @@ public class SplineLeftAuto extends LinearOpMode {
                 .strafeTo(new Vector2d(-28.5, -4.5))
                 .build();
 
-
-        /*TrajectorySequence conePickup = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-60, -12))
-                .build();
-
-        TrajectorySequence coneScore = drive.trajectorySequenceBuilder(conePickup.end())
+        TrajectorySequence goalToNuteral = drive.trajectorySequenceBuilder(highPose)
                 .addDisplacementMarker(() -> {
                     prime();
                 })
-                .splineToSplineHeading(scorePose, Math.toRadians(40))
-                .build();*/
-
-        TrajectorySequence park1 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-36, -12)) // neutral pos
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150)) // neutral heading
-                .strafeTo(new Vector2d(-62, -12)) //park pos
+                .strafeTo(new Vector2d(-35, -10.2))
+                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-28.5, -4.5))
                 .build();
 
-        TrajectorySequence park2 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-36, -12)) // neutral pos
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150)) // neutral heading
+        TrajectorySequence nuteralToPickup = drive.trajectorySequenceBuilder(startToHigh.end())
+                .strafeTo(new Vector2d(-60, -12))
                 .build();
 
-        TrajectorySequence park3 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-36, -12)) //neutral
+        TrajectorySequence nuteralToHigh = drive.trajectorySequenceBuilder(nuteralToPickup.end())
+                .addDisplacementMarker(() -> {
+                    prime();
+                })
+                .splineToSplineHeading(highPose, Math.toRadians(40))
+                .build();
+
+        TrajectorySequence park1 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
+                .strafeTo(new Vector2d(-36, -12))
+                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+                .strafeTo(new Vector2d(-58, -12))
+                .build();
+
+        TrajectorySequence park2 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
+                .strafeTo(new Vector2d(-36, -12))
+                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+                .build();
+
+        TrajectorySequence park3 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
+                .strafeTo(new Vector2d(-35, -12))
                 .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
                 .strafeTo(new Vector2d(-12, -12))
                 .build();
-
-
 
 
         // Camera Setup
@@ -112,50 +122,24 @@ public class SplineLeftAuto extends LinearOpMode {
         waitForStart();
 
 
-        /*drive.followTrajectorySequence(preloadToGoal);
+        //drive.followTrajectorySequence(startToHigh);
         score();
-        prime();
         sleep(500);
-        robot.claw(true);*/
-        rest();
-        sleep(2000);
+        robot.claw(false);
+
         prime();
-        sleep(3500);
-        score();
-        sleep(1000);
-        restFromScore();
-        sleep(2000);
-
-
-        restAtConeLevel(1);
-        sleep(1000);
-        robot.claw(true);
-        restAtConeLevel(2);
-        sleep(1000);
-        robot.claw(true);
-        restAtConeLevel(3);
-        sleep(1000);
-        robot.claw(true);
-        restAtConeLevel(4);
-        sleep(1000);
-        robot.claw(true);
-        restAtConeLevel(5);
-        sleep(1000);
-        robot.claw(true);
-
-        hold();
-
-        sleep(2000);
+        sleep(750);
         rest();
+        robot.claw(false);
+        sleep(250);
 
-
-        /*if(tagOfInterest == 1){
+        if (tagOfInterest == 1) {
             drive.followTrajectorySequence(park1);
-        } else if(tagOfInterest == 2){
+        } else if (tagOfInterest == 2) {
             drive.followTrajectorySequence(park2);
-        } else if(tagOfInterest == 3){
+        } else if (tagOfInterest == 3) {
             drive.followTrajectorySequence(park3);
-        }*/
+        }
     }
 
     private void prime() {
@@ -165,10 +149,11 @@ public class SplineLeftAuto extends LinearOpMode {
     private void score() {
         robot.moveLift(1, 4000);
         robot.moveFourBar(1000);
-        sleep(750);
+        sleep(300);
         robot.claw(true);
         sleep(750);
         robot.claw(false);}
+
     private void primeLow() {     //doesn't use fourbar for low goal
         robot.claw(false);
         robot.moveLift(1, 4000);}
@@ -185,38 +170,38 @@ public class SplineLeftAuto extends LinearOpMode {
     private void restAtConeLevel(int numCones) {
         switch (numCones) {
             case 0: {
-                robot.moveLift(1, 0);
+                robot.moveFourBar(0);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 1: {
-                robot.moveLift(1, 1000);
+                robot.moveFourBar(110);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 2: {
-                robot.moveLift(1, 1200);
+                robot.moveFourBar(140);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 3: {
-                robot.moveLift(1, 1400);
+                robot.moveFourBar(170);
                 break;
             }
 
             case 4: {
-                robot.moveLift(1, 1600);
+                robot.moveFourBar(200);
                 break;
             }
 
             case 5: {
-                robot.moveLift(1, 650);
+                robot.moveFourBar(230);
                 break;
             }
         }
@@ -232,6 +217,6 @@ public class SplineLeftAuto extends LinearOpMode {
     private void hold() {
         robot.claw(false);
         sleep(250);
-        robot.moveLift(1, 1300);
-        robot.moveFourBar(0);}
-    }
+        robot.moveLift(1, 400);
+        robot.moveFourBar(150);}
+}
