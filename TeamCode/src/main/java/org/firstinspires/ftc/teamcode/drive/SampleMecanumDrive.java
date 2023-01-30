@@ -79,7 +79,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                new Pose2d(0.5, 0.5, Math.toRadians(4.0)), 0.45);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -181,6 +181,14 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void turn(double angle) {
+        turnAsync(angle);
+        waitForIdle();
+    }
+
+    public void turnToAbosolute(Pose2d currentPose, double goalAngle) {
+
+
+        double angle = currentPose.getHeading() - goalAngle;
         turnAsync(angle);
         waitForIdle();
     }

@@ -120,14 +120,14 @@ public class SplineLeftAuto extends LinearOpMode {
         rest();
         sleep(2000);
         prime();
-        sleep(3500);
+        //sleep(2000);
         score();
-        sleep(1000);
+        sleep(1500);
         restFromScore();
         sleep(2000);
 
 
-        restAtConeLevel(1);
+        /*restAtConeLevel(1);
         sleep(1000);
         robot.claw(true);
         restAtConeLevel(2);
@@ -146,7 +146,7 @@ public class SplineLeftAuto extends LinearOpMode {
         hold();
 
         sleep(2000);
-        rest();
+        rest();*/
 
 
         /*if(tagOfInterest == 1){
@@ -165,7 +165,7 @@ public class SplineLeftAuto extends LinearOpMode {
     private void score() {
         robot.moveLift(1, 4000);
         robot.moveFourBar(1000);
-        sleep(750);
+        sleep(500);
         robot.claw(true);
         sleep(750);
         robot.claw(false);}

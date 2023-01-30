@@ -27,43 +27,56 @@ public class CycleLeftAuto extends LinearOpMode {
         robot.ready(this);
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
-        Pose2d highPose = new Pose2d(-29, -5, Math.toRadians(220));
-        Pose2d pickupPose = new Pose2d(-60, -12, Math.toRadians(180));
-        Pose2d nuteralPose = new Pose2d(-60, -12, Math.toRadians(180));
+        double  east = Math.toRadians(0);
+        double  northEast = Math.toRadians(45);
+        double  north = Math.toRadians(90);
+        double  northWest = Math.toRadians(125);
+        double  west = Math.toRadians(180);
+        double  southWest = Math.toRadians(205);
+        double  south = Math.toRadians(270);
+        double  southEast = Math.toRadians(295);
+
+        Pose2d startPose      = new Pose2d(-35, -64, north);
+        Pose2d scorePose      = new Pose2d(-29, -5, northWest);
+        Pose2d pickupPose     = new Pose2d(-60, -12, east);
+        Vector2d pickupVector = new Vector2d(-60, -12);
+        Vector2d nutralVector = new Vector2d(-35 -12);
         drive.setPoseEstimate(startPose);
 
         //
 
 
         // Trajectory setup
-        TrajectorySequence startToHigh = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence startToHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addDisplacementMarker(() -> {
                     prime();
                 })
-                .strafeTo(new Vector2d(-35, -10.2))
+                .strafeTo(nutralVector)
                 .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-28.5, -4.5))
+                .lineToLinearHeading(scorePose)
                 .build();
 
-        TrajectorySequence goalToNuteral = drive.trajectorySequenceBuilder(highPose)
+        TrajectorySequence goalToNuteral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addDisplacementMarker(() -> {
-                    prime();
+                    rest();
                 })
-                .strafeTo(new Vector2d(-35, -10.2))
+                .strafeTo(nutralVector)
                 .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-28.5, -4.5))
                 .build();
 
-        TrajectorySequence nuteralToPickup = drive.trajectorySequenceBuilder(startToHigh.end())
-                .strafeTo(new Vector2d(-60, -12))
+        TrajectorySequence nuteralToPickup = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .strafeTo(pickupVector)
                 .build();
 
-        TrajectorySequence nuteralToHigh = drive.trajectorySequenceBuilder(nuteralToPickup.end())
+        TrajectorySequence pickupToNuteral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .strafeTo(nutralVector)
+                .build();
+
+        TrajectorySequence nuteralToHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addDisplacementMarker(() -> {
                     prime();
                 })
-                .splineToSplineHeading(highPose, Math.toRadians(40))
+                .splineToSplineHeading(scorePose, Math.toRadians(40))
                 .build();
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
@@ -122,16 +135,21 @@ public class CycleLeftAuto extends LinearOpMode {
         waitForStart();
 
 
-        //drive.followTrajectorySequence(startToHigh);
+        drive.followTrajectorySequence(startToHigh);
         score();
         sleep(500);
         robot.claw(false);
-
         prime();
         sleep(750);
         rest();
         robot.claw(false);
-        sleep(250);
+
+        drive.followTrajectorySequence(goalToNuteral);
+        drive.followTrajectorySequence(nuteralToPickup);
+        drive.followTrajectorySequence(pickupToNuteral);
+        drive.followTrajectorySequence(nuteralToHigh);
+        //drive.followTrajectorySequence();
+
 
         if (tagOfInterest == 1) {
             drive.followTrajectorySequence(park1);

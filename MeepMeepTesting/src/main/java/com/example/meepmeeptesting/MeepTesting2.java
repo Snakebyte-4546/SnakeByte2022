@@ -18,9 +18,37 @@ public class MeepTesting2 {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(900);
 
-        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
-        Pose2d scorePose= new Pose2d(-29, -5, Math.toRadians(220));
-        Pose2d pickupPose = new Pose2d(-60, -12, Math.toRadians(180));
+
+        double  east = Math.toRadians(0);
+        double  northEast = Math.toRadians(45);
+        double  north = Math.toRadians(90);
+        double  northWest = Math.toRadians(125);
+        double  west = Math.toRadians(180);
+        double  southWest = Math.toRadians(205);
+        double  south = Math.toRadians(270);
+        double  southEast = Math.toRadians(295);
+
+        Pose2d startPose = new Pose2d(-35, -64, north);
+        Pose2d scorePose= new Pose2d(-29, -5, northWest);
+        Pose2d pickupPose = new Pose2d(-60, -12, east);
+        Vector2d nutralVector = new Vector2d(-36 -12);
+
+
+        RoadRunnerBotEntity positionTester = new DefaultBotBuilder(meepMeep)
+                .setConstraints(35, 20, Math.toRadians(100), Math.toRadians(250), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                            return drive.trajectorySequenceBuilder(startPose)
+
+                                    //first
+                                    .lineTo(nutralVector)
+                                    .lineToSplineHeading(poseMaker(nutralVector, Math.toRadians(359)))
+
+                                    .forward(.1)
+
+                                    .build();
+                        }
+                );
 
 
         RoadRunnerBotEntity test = new DefaultBotBuilder(meepMeep)
@@ -31,31 +59,16 @@ public class MeepTesting2 {
                             return drive.trajectorySequenceBuilder(startPose)
 
 
-                                    // preloadToGoal
-                                    .addDisplacementMarker(() -> {
-                                        //empty
-                                    })
-                                    .strafeTo(new Vector2d(-35, -10.2))
-                                    .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                                    .strafeTo(new Vector2d(-28.5, -4.5))
+                                    // preloadToNutral
+                                    .strafeTo(nutralVector)
+                                    .lineToSplineHeading(poseMaker(nutralVector, northWest))
 
                                     // score1
-                                    .strafeTo(new Vector2d(-36, -12))
-                                    .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+                                    .lineToSplineHeading(scorePose)
                                     .strafeTo(new Vector2d(-58, -12))
 
                                     //.strafeTo(new Vector2d(-36, -12))
                                     //.turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
-                                    .build();
-                        }
-                );
-
-        RoadRunnerBotEntity positionTester = new DefaultBotBuilder(meepMeep)
-                .setConstraints(35, 20, Math.toRadians(100), Math.toRadians(250), 9.5)
-                .setDimensions(12.87    , 12)
-                .followTrajectorySequence(drive -> {
-                            return drive.trajectorySequenceBuilder(new Pose2d(-36, -12, Math.toRadians(90)))
-                                    .forward(.1)
                                     .build();
                         }
                 );
@@ -151,6 +164,9 @@ public class MeepTesting2 {
                 .addEntity(positionTester) //  test | drift | motionCalibration | positionTester
                 .start();
     }
+        private static Pose2d poseMaker(Vector2d cord, double head) {
+            return new Pose2d(cord.getX() + .01, cord.getY(), head);
+        }
 
 
 }
