@@ -11,7 +11,7 @@ import com.acmerobotics.roadrunner.util.Angle;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
-import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+//import com.noahbres.meepmeep.roadrunner.trajectorysequence.RoadRunnerBotEntityBuilder;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.sequencesegment.TurnSegment;
 
 public class MeepTesting2 {
@@ -28,13 +28,14 @@ public class MeepTesting2 {
         double  south = Math.toRadians(270);
         double  southEast = Math.toRadians(295);
 
-        Pose2d startPose = new Pose2d(-35, -64, north);
-        Pose2d scorePose= new Pose2d(-29, -5, northWest);
-        Pose2d pickupPose = new Pose2d(-60, -12, east);
-        Vector2d nutralVector = new Vector2d(-36 -12);
+        Pose2d start_pose      = new Pose2d(-35, -64, north);
+        Pose2d scoreHigh_pose  = new Pose2d(-29, -5, northEast);
+        Pose2d pickup_pose     = new Pose2d(-60, -12, west);
+        Pose2d neutral_pose     = new Pose2d(-35, -12, west);
+        Vector2d pickup_vector = new Vector2d(-60, -12);
+        Vector2d neutral_vector = new Vector2d(-35, -12);
 
-
-        RoadRunnerBotEntity positionTester = new DefaultBotBuilder(meepMeep)
+        /*RoadRunnerBotEntity positionTester = new DefaultBotBuilder(meepMeep)
                 .setConstraints(35, 20, Math.toRadians(100), Math.toRadians(250), 9.5)
                 .setDimensions(12.87    , 12)
                 .followTrajectorySequence(drive -> {
@@ -55,7 +56,7 @@ public class MeepTesting2 {
         // Set bot constraints: maxVel     maxAccel     maxAngVel            maxAngAccel          track width
                 .setConstraints(35, 20, Math.toRadians(100), Math.toRadians(250), 9.5)
                 .setDimensions(12.87    , 12)
-                .followTrajectorySequence(drive -> {
+                .followRoadRunnerBotEntity(drive -> {
                             return drive.trajectorySequenceBuilder(startPose)
 
 
@@ -78,7 +79,7 @@ public class MeepTesting2 {
                 // Set bot constraints: maxVel     maxAccel     maxAngVel            maxAngAccel          track width
                 .setConstraints(45, 45, Math.toRadians(305), Math.toRadians(300), 9.5)
                 .setDimensions(12.87    , 12)
-                .followTrajectorySequence(drive -> {
+                .followRoadRunnerBotEntity(drive -> {
                             return drive.trajectorySequenceBuilder(new Pose2d(-35, -64, Math.toRadians(90)))
 
                                     //drop off first cone
@@ -95,7 +96,7 @@ public class MeepTesting2 {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
                 .setDimensions(12.87    , 12)
-                .followTrajectorySequence(drive -> {
+                .followRoadRunnerBotEntity(drive -> {
                             return drive.trajectorySequenceBuilder(new Pose2d(-35, -64, Math.toRadians(90)))
 
                                     .strafeTo(new Vector2d(-35, -12.5))
@@ -114,46 +115,119 @@ public class MeepTesting2 {
                                     .lineToLinearHeading(new Pose2d(-35, -64, Math.toRadians(90)))
                                     .build();
                         }
-                );
+                );*/
 
-
-
-        /*Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
-        Pose2d scorePose= new Pose2d(-29, -5, Math.toRadians(220));
-        Pose2d pickupPose = new Pose2d(-60, -12, Math.toRadians(180));
-        drive.setPoseEstimate(startPose);
 
 
         // Trajectory setup
-        RoadRunnerBotEntity preloadToGoal = drive.trajectorySequenceBuilder(startPose)
-            return drive.trajectorySequenceBuilder(startPose)
-                .addDisplacementMarker(() -> {
-                    //prime();
-                })
-                .strafeTo(new Vector2d(-35, -10.2))
-                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-28.5, -4.5))
+        RoadRunnerBotEntity startToHigh = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                            return drive.trajectorySequenceBuilder(start_pose)
+                                    .lineTo(neutral_vector)
+                                    .turn(Math.toRadians(-45))
+                                    .lineToLinearHeading(scoreHigh_pose)
+                                    .build();
+                        }
+                );
+
+        RoadRunnerBotEntity highToNeutral = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(scoreHigh_pose)
+                            .lineTo(neutral_vector)
+                            .turn(Math.toRadians(135))
+                            .build();
+                        }
+                );
+
+        RoadRunnerBotEntity pickupNeutral = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                            .addSpatialMarker(new Vector2d(-35 -12), () -> {
+
+                            })
+                            .lineTo(pickup_vector)
+                            .addDisplacementMarker(() -> {
+                            })
+                            .waitSeconds(1)
+                            .lineTo(neutral_vector)
+                            .build();
+                        }
+                );
+
+        RoadRunnerBotEntity pickupToNeutral = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(pickup_pose)
+                .lineTo(neutral_vector)
                 .build();
+                        }
+                );
+        RoadRunnerBotEntity scoreHigh = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                            .turn(Math.toRadians(-135))
+                            .lineToLinearHeading(scoreHigh_pose)
+                            .addDisplacementMarker(() -> {
 
+                            })
+                            .waitSeconds(4)
+                            .lineTo(neutral_vector)
+                            .turn(Math.toRadians(135))
+                            .build();
+                        }
+                );
 
-
-        RoadRunnerBotEntity park1 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-            return drive.trajectorySequenceBuilder(startPose)
-                .strafeTo(new Vector2d(-36, -12)) // neutral pos
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150)) // neutral heading
-                .strafeTo(new Vector2d(-62, -12)) //park pos
+        RoadRunnerBotEntity park1 = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                .lineToLinearHeading(poseMaker(neutral_vector, west))
+                .lineTo(new Vector2d(-58, -12))
                 .build();
+                        }
+                );
 
-        RoadRunnerBotEntity park2 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-36, -12)) // neutral pos
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150)) // neutral heading
+        RoadRunnerBotEntity park2 = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                .lineToLinearHeading(poseMaker(neutral_vector, west))
                 .build();
+                        }
+                );
 
-        RoadRunnerBotEntity park3 = drive.trajectorySequenceBuilder(preloadToGoal.end())
-                .strafeTo(new Vector2d(-36, -12)) //neutral
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-12, -12))
-                .build();*/
+        RoadRunnerBotEntity park3 = new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                .lineToLinearHeading(poseMaker(neutral_vector, west))
+                .lineTo(new Vector2d(-12, -12))
+                .build();
+                        }
+                );
+
+        RoadRunnerBotEntity neutralToStart =new DefaultBotBuilder(meepMeep)
+                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
+                .setDimensions(12.87    , 12)
+                .followTrajectorySequence(drive -> {
+                    return drive.trajectorySequenceBuilder(neutral_pose)
+                            .turn(Math.toRadians(-90))
+                            .lineTo(new Vector2d(-35, -64))
+                .build();
+                        }
+                );
 
 
 
@@ -161,12 +235,15 @@ public class MeepTesting2 {
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(positionTester) //  test | drift | motionCalibration | positionTester
+                //.addEntity(positionTester) //  test | drift | motionCalibration | positionTester
+                //.addEntity(scoreHigh)
+                //.addEntity(pickupNeutral)
+                .addEntity(scoreHigh)
                 .start();
     }
-        private static Pose2d poseMaker(Vector2d cord, double head) {
-            return new Pose2d(cord.getX() + .01, cord.getY(), head);
-        }
+                    private static Pose2d poseMaker(Vector2d cord, double head) {
+                        return new Pose2d(cord.getX() + .1, cord.getY(), head);
+                    }
 
 
 }

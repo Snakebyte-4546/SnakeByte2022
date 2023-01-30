@@ -19,6 +19,7 @@ public class CycleLeftAuto extends LinearOpMode {
 
     int tagOfInterest = 0;
     AutoMethods robot = new AutoMethods();
+    private int numCones;
 
     @Override
     public void runOpMode() {
@@ -36,64 +37,74 @@ public class CycleLeftAuto extends LinearOpMode {
         double  south = Math.toRadians(270);
         double  southEast = Math.toRadians(295);
 
-        Pose2d startPose      = new Pose2d(-35, -64, north);
-        Pose2d scorePose      = new Pose2d(-29, -5, northWest);
-        Pose2d pickupPose     = new Pose2d(-60, -12, east);
-        Vector2d pickupVector = new Vector2d(-60, -12);
-        Vector2d nutralVector = new Vector2d(-35 -12);
-        drive.setPoseEstimate(startPose);
+        Pose2d start_pose      = new Pose2d(-35, -64, north);
+        Pose2d scoreHigh_pose  = new Pose2d(-29, -5, northEast);
+        Pose2d pickup_pose     = new Pose2d(-60, -12, west);
+        Vector2d pickup_vector = new Vector2d(-60, -12);
+        Vector2d neutral_vector = new Vector2d(-35, -12);
+        drive.setPoseEstimate(start_pose);
 
         //
 
 
         // Trajectory setup
+
         TrajectorySequence startToHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addDisplacementMarker(() -> {
                     prime();
                 })
-                .strafeTo(nutralVector)
-                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .lineToLinearHeading(scorePose)
+                .lineTo(neutral_vector)
+                .turn(Math.toRadians(-45))
+                .lineToLinearHeading(scoreHigh_pose)
                 .build();
 
-        TrajectorySequence goalToNuteral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .addDisplacementMarker(() -> {
-                    rest();
+        TrajectorySequence highToNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+
+                .lineTo(neutral_vector)
+                .turn(Math.toRadians(135))
+                .build();
+
+        TrajectorySequence pickupNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .addSpatialMarker(new Vector2d(-35 -12), () -> {
+                    restAtConeLevel(numCones);
                 })
-                .strafeTo(nutralVector)
-                .turn(Math.toRadians(130), Math.toRadians(80), Math.toRadians(150))
-                .build();
-
-        TrajectorySequence nuteralToPickup = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .strafeTo(pickupVector)
-                .build();
-
-        TrajectorySequence pickupToNuteral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .strafeTo(nutralVector)
-                .build();
-
-        TrajectorySequence nuteralToHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineTo(pickup_vector)
                 .addDisplacementMarker(() -> {
-                    prime();
+                    intake();
                 })
-                .splineToSplineHeading(scorePose, Math.toRadians(40))
+                .waitSeconds(1)
+                .lineTo(neutral_vector)
                 .build();
 
-        TrajectorySequence park1 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
-                .strafeTo(new Vector2d(-36, -12))
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-58, -12))
+        TrajectorySequence pickupToNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+
                 .build();
 
-        TrajectorySequence park2 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
-                .strafeTo(new Vector2d(-36, -12))
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
+        TrajectorySequence scoreHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .turn(Math.toRadians(-135))
+                .lineToLinearHeading(scoreHigh_pose)
+                .addDisplacementMarker(() -> {
+                    score();
+                })
+                .waitSeconds(4)
+                .lineTo(neutral_vector)
+                .turn(Math.toRadians(135))
                 .build();
 
-        TrajectorySequence park3 = drive.trajectorySequenceBuilder(nuteralToHigh.end())
-                .strafeTo(new Vector2d(-35, -12))
-                .turn(Math.toRadians(-40), Math.toRadians(80), Math.toRadians(150))
-                .strafeTo(new Vector2d(-12, -12))
+        TrajectorySequence park1 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineTo(new Vector2d(-58, -12))
+                .build();
+
+        TrajectorySequence park2 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .build();
+
+        TrajectorySequence park3 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineTo(new Vector2d(-12, -12))
+                .build();
+
+        TrajectorySequence neutralToStart = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .turn(Math.toRadians(-90))
+                .lineTo(new Vector2d(-35, -64))
                 .build();
 
 
@@ -137,17 +148,14 @@ public class CycleLeftAuto extends LinearOpMode {
 
         drive.followTrajectorySequence(startToHigh);
         score();
-        sleep(500);
-        robot.claw(false);
-        prime();
-        sleep(750);
-        rest();
-        robot.claw(false);
 
-        drive.followTrajectorySequence(goalToNuteral);
-        drive.followTrajectorySequence(nuteralToPickup);
-        drive.followTrajectorySequence(pickupToNuteral);
-        drive.followTrajectorySequence(nuteralToHigh);
+        drive.followTrajectorySequence(highToNeutral);
+        drive.followTrajectorySequence(pickupNeutral);
+        numCones--;
+        drive.followTrajectorySequence(scoreHigh);
+
+
+
         //drive.followTrajectorySequence();
 
 
@@ -158,6 +166,14 @@ public class CycleLeftAuto extends LinearOpMode {
         } else if (tagOfInterest == 3) {
             drive.followTrajectorySequence(park3);
         }
+        else {
+            drive.followTrajectorySequence(neutralToStart);
+        }
+    }
+
+    private void intake() {
+        //will eventually call alignment method and movement stuff
+        hold();
     }
 
     private void prime() {
@@ -167,10 +183,13 @@ public class CycleLeftAuto extends LinearOpMode {
     private void score() {
         robot.moveLift(1, 4000);
         robot.moveFourBar(1000);
-        sleep(300);
+        sleep(500);
         robot.claw(true);
+        sleep(1000);
+        robot.claw(false);
+        prime();
         sleep(750);
-        robot.claw(false);}
+        restFromScore();}
 
     private void primeLow() {     //doesn't use fourbar for low goal
         robot.claw(false);
@@ -229,7 +248,7 @@ public class CycleLeftAuto extends LinearOpMode {
         robot.moveFourBar(0);
         sleep(500);
         robot.moveLift(1, 0);
-        sleep(2000);
+        sleep(1800);
         robot.claw(true);}
 
     private void hold() {
@@ -237,4 +256,8 @@ public class CycleLeftAuto extends LinearOpMode {
         sleep(250);
         robot.moveLift(1, 400);
         robot.moveFourBar(150);}
+
+    private static Pose2d poseMaker(Vector2d cord, double head) {
+        return new Pose2d(cord.getX() + .01, cord.getY(), head);
+    }
 }
