@@ -121,10 +121,10 @@ public class OneDriverTeleOp extends OpMode {
         }
         if(gamepad1.dpad_up){
             fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fourbar.setPower(.6);
+            fourbar.setPower(.8);
         } else if(gamepad1.dpad_down){
             fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fourbar.setPower(-.6);
+            fourbar.setPower(-.8);
         } else{
             fourbar.setPower(0);
         }

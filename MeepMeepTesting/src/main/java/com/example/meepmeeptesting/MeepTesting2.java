@@ -24,15 +24,19 @@ public class MeepTesting2 {
         double  north = Math.toRadians(90);
         double  northWest = Math.toRadians(125);
         double  west = Math.toRadians(180);
-        double  southWest = Math.toRadians(205);
+        double  southWest = Math.toRadians(225);
         double  south = Math.toRadians(270);
         double  southEast = Math.toRadians(295);
 
         Pose2d start_pose      = new Pose2d(-35, -64, north);
-        Pose2d scoreHigh_pose  = new Pose2d(-29, -5, northEast);
+
+        Pose2d scoreHigh_pose  = new Pose2d(-29, -5, southWest);
+        Vector2d scoreHigh_vector  = new Vector2d(-29, -5);
+
         Pose2d pickup_pose     = new Pose2d(-60, -12, west);
-        Pose2d neutral_pose     = new Pose2d(-35, -12, west);
         Vector2d pickup_vector = new Vector2d(-60, -12);
+
+        Pose2d neutral_pose      = new Pose2d(-35, -12,west);
         Vector2d neutral_vector = new Vector2d(-35, -12);
 
         /*RoadRunnerBotEntity positionTester = new DefaultBotBuilder(meepMeep)
@@ -75,23 +79,6 @@ public class MeepTesting2 {
                 );
 
 
-        RoadRunnerBotEntity drift = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel     maxAccel     maxAngVel            maxAngAccel          track width
-                .setConstraints(45, 45, Math.toRadians(305), Math.toRadians(300), 9.5)
-                .setDimensions(12.87    , 12)
-                .followRoadRunnerBotEntity(drive -> {
-                            return drive.trajectorySequenceBuilder(new Pose2d(-35, -64, Math.toRadians(90)))
-
-                                    //drop off first cone
-
-                                    .forward(5)
-                                    .splineToSplineHeading(new Pose2d(-29, -15, Math.toRadians(220)), Math.toRadians(62))
-
-                                    .build();
-                        }
-                );
-
-
         RoadRunnerBotEntity motionCalibration = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
@@ -120,14 +107,39 @@ public class MeepTesting2 {
 
 
         // Trajectory setup
-        RoadRunnerBotEntity startToHigh = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity startToNeutral = new DefaultBotBuilder(meepMeep)
                 .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
                 .setDimensions(12.87    , 12)
                 .followTrajectorySequence(drive -> {
                             return drive.trajectorySequenceBuilder(start_pose)
+                                    .addDisplacementMarker(5, () -> {
+                                        //prime();
+                                        })
                                     .lineTo(neutral_vector)
-                                    .turn(Math.toRadians(-45))
+
+                                    // from neutral to highGoal
+                                    .turn(Math.toRadians(135))
                                     .lineToLinearHeading(scoreHigh_pose)
+                                    // score
+                                    .addDisplacementMarker(() -> {
+                                        //score();
+                                        })
+                                    .waitSeconds(2)
+
+                                    // from highGoal to neutral
+                                    .lineTo(neutral_vector)
+                                    .turn(Math.toRadians(135))
+
+                                    // from neutral to pickup
+                                    .addSpatialMarker(new Vector2d(-35 -12), () -> {
+                                        //restAtConeLevel(numCones);
+                                        })
+                                    .lineTo(pickup_vector)
+                                    .addDisplacementMarker(() -> {
+                                        //intake();
+                                    })
+                                    .waitSeconds(2)
+                                    .lineTo(neutral_vector)
                                     .build();
                         }
                 );
@@ -143,20 +155,28 @@ public class MeepTesting2 {
                         }
                 );
 
-        RoadRunnerBotEntity pickupNeutral = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity scoreHigh = new DefaultBotBuilder(meepMeep)
                 .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
                 .setDimensions(12.87    , 12)
                 .followTrajectorySequence(drive -> {
-                    return drive.trajectorySequenceBuilder(neutral_pose)
-                            .addSpatialMarker(new Vector2d(-35 -12), () -> {
+                            return drive.trajectorySequenceBuilder(pickup_pose)
+                                    .lineTo(neutral_vector)
 
-                            })
-                            .lineTo(pickup_vector)
-                            .addDisplacementMarker(() -> {
-                            })
-                            .waitSeconds(1)
-                            .lineTo(neutral_vector)
-                            .build();
+                                    //to High and score
+                                    .turn(Math.toRadians(45))
+                                    .lineToLinearHeading(scoreHigh_pose)
+                                    .addDisplacementMarker(() -> {
+                                        //score();
+                                    })
+                                    .waitSeconds(4)
+
+                                    //back to neutral
+                                    .lineTo(neutral_vector)
+                                    .turn(Math.toRadians(-45))
+
+                                    //from neutral to pickup
+                                    .lineTo(pickup_vector)
+                                    .build();
                         }
                 );
 
@@ -167,22 +187,6 @@ public class MeepTesting2 {
                     return drive.trajectorySequenceBuilder(pickup_pose)
                 .lineTo(neutral_vector)
                 .build();
-                        }
-                );
-        RoadRunnerBotEntity scoreHigh = new DefaultBotBuilder(meepMeep)
-                .setConstraints(55, 50.5, Math.toRadians(305), Math.toRadians(305), 9.5)
-                .setDimensions(12.87    , 12)
-                .followTrajectorySequence(drive -> {
-                    return drive.trajectorySequenceBuilder(neutral_pose)
-                            .turn(Math.toRadians(-135))
-                            .lineToLinearHeading(scoreHigh_pose)
-                            .addDisplacementMarker(() -> {
-
-                            })
-                            .waitSeconds(4)
-                            .lineTo(neutral_vector)
-                            .turn(Math.toRadians(135))
-                            .build();
                         }
                 );
 
@@ -232,12 +236,11 @@ public class MeepTesting2 {
 
 
 
+
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                //.addEntity(positionTester) //  test | drift | motionCalibration | positionTester
-                //.addEntity(scoreHigh)
-                //.addEntity(pickupNeutral)
+                //.addEntity(startToNeutral)
                 .addEntity(scoreHigh)
                 .start();
     }

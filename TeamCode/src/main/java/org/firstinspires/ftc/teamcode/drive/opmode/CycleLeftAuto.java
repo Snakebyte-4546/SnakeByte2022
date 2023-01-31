@@ -33,14 +33,20 @@ public class CycleLeftAuto extends LinearOpMode {
         double  north = Math.toRadians(90);
         double  northWest = Math.toRadians(125);
         double  west = Math.toRadians(180);
-        double  southWest = Math.toRadians(205);
+        double  southWest = Math.toRadians(225);
         double  south = Math.toRadians(270);
         double  southEast = Math.toRadians(295);
 
         Pose2d start_pose      = new Pose2d(-35, -64, north);
-        Pose2d scoreHigh_pose  = new Pose2d(-29, -5, northEast);
-        Pose2d pickup_pose     = new Pose2d(-60, -12, west);
+        Vector2d start_vector  = new Vector2d(-35,-64);
+
+        Pose2d scoreHigh_pose  = new Pose2d(-29, -4.4, southWest);
+        Vector2d scoreHigh_vector  = new Vector2d(-29, -5);
+
+        Pose2d pickup_pose     = new Pose2d(-55, -12, west);
         Vector2d pickup_vector = new Vector2d(-60, -12);
+
+        Pose2d neutral_pose      = new Pose2d(-35, -12,west);
         Vector2d neutral_vector = new Vector2d(-35, -12);
         drive.setPoseEstimate(start_pose);
 
@@ -49,22 +55,33 @@ public class CycleLeftAuto extends LinearOpMode {
 
         // Trajectory setup
 
-        TrajectorySequence startToHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence startToPickup = drive.trajectorySequenceBuilder(start_pose)
+
+                // from stat to neutral
+                .lineTo(neutral_vector)
+                .addDisplacementMarker(5, () -> {
+                    prime();})
+
+                // from neutral to highGoal
+                .turn(Math.toRadians(135))
+                .lineToLinearHeading(scoreHigh_pose)
+                // score
                 .addDisplacementMarker(() -> {
-                    prime();
-                })
+                    score();})
+                .waitSeconds(0)
+
+                // from highGoal to neutral
                 .lineTo(neutral_vector)
                 .turn(Math.toRadians(-45))
-                .lineToLinearHeading(scoreHigh_pose)
+
+                // from neutral to pickup
+                .addSpatialMarker(new Vector2d(-35 -12), () -> {
+                    restAtConeLevel(numCones);})
+                .lineTo(pickup_vector)
                 .build();
 
-        TrajectorySequence highToNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
 
-                .lineTo(neutral_vector)
-                .turn(Math.toRadians(135))
-                .build();
-
-        TrajectorySequence pickupNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence pickupFromNeutral = drive.trajectorySequenceBuilder(neutral_pose)
                 .addSpatialMarker(new Vector2d(-35 -12), () -> {
                     restAtConeLevel(numCones);
                 })
@@ -76,34 +93,49 @@ public class CycleLeftAuto extends LinearOpMode {
                 .lineTo(neutral_vector)
                 .build();
 
-        TrajectorySequence pickupToNeutral = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
 
-                .build();
+        TrajectorySequence scoreHigh = drive.trajectorySequenceBuilder(pickup_pose)
 
-        TrajectorySequence scoreHigh = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .turn(Math.toRadians(-135))
+                //from pickup to neutral
+                .lineTo(neutral_vector)
+
+                //to High and score
+                .turn(Math.toRadians(45))
                 .lineToLinearHeading(scoreHigh_pose)
                 .addDisplacementMarker(() -> {
                     score();
                 })
-                .waitSeconds(4)
+                .waitSeconds(3)
+
+                //back to neutral
                 .lineTo(neutral_vector)
-                .turn(Math.toRadians(135))
+                .turn(Math.toRadians(-45))
+
+                //from neutral to pickup
+                .lineTo(pickup_vector)
                 .build();
 
-        TrajectorySequence park1 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence pickupToStart = drive.trajectorySequenceBuilder(pickup_pose)
+
+                //from pickup to neutral
+                .lineTo(neutral_vector)
+                .lineTo(start_vector)
+                .build();
+
+        TrajectorySequence park1 = drive.trajectorySequenceBuilder(neutral_pose)
                 .lineTo(new Vector2d(-58, -12))
                 .build();
 
-        TrajectorySequence park2 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence park2 = drive.trajectorySequenceBuilder(neutral_pose)
+                .lineTo(new Vector2d(-35.5, -12))
                 .build();
 
-        TrajectorySequence park3 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence park3 = drive.trajectorySequenceBuilder(neutral_pose)
                 .lineTo(new Vector2d(-12, -12))
                 .build();
 
-        TrajectorySequence neutralToStart = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .turn(Math.toRadians(-90))
+        TrajectorySequence neutralToStart = drive.trajectorySequenceBuilder(neutral_pose)
+                .turn(Math.toRadians(90))
                 .lineTo(new Vector2d(-35, -64))
                 .build();
 
@@ -145,14 +177,13 @@ public class CycleLeftAuto extends LinearOpMode {
 
         waitForStart();
 
+        hold();
+        drive.followTrajectorySequence(startToPickup); //score first cone
 
-        drive.followTrajectorySequence(startToHigh);
-        score();
-
-        drive.followTrajectorySequence(highToNeutral);
-        drive.followTrajectorySequence(pickupNeutral);
         numCones--;
-        drive.followTrajectorySequence(scoreHigh);
+        drive.followTrajectorySequence(scoreHigh); //scores again on high
+        drive.followTrajectorySequence(pickupToStart);
+
 
 
 
@@ -171,21 +202,27 @@ public class CycleLeftAuto extends LinearOpMode {
         }
     }
 
+
+
+
+
+
+
+
     private void intake() {
         //will eventually call alignment method and movement stuff
         hold();
     }
 
-    private void prime() {
+    private void prime() { //takes ~2300 ms
         robot.claw(false);
         robot.moveLift(1, 4000);
         robot.moveFourBar(660);}
     private void score() {
-        robot.moveLift(1, 4000);
         robot.moveFourBar(1000);
-        sleep(500);
+        sleep(300);
         robot.claw(true);
-        sleep(1000);
+        sleep(700);
         robot.claw(false);
         prime();
         sleep(750);
@@ -207,38 +244,50 @@ public class CycleLeftAuto extends LinearOpMode {
     private void restAtConeLevel(int numCones) {
         switch (numCones) {
             case 0: {
+                robot.moveFourBar(50);
+                robot.moveLift(1, 600);
+                sleep(500);
+                robot.moveLift(1, 0);
+                robot.claw(true);
+                break;
+            }
+
+            case 1: {
+                robot.claw(false);
+                sleep(250);
+                robot.moveLift(1, 600);
                 robot.moveFourBar(0);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
-            case 1: {
-                robot.moveFourBar(110);
-                sleep(500);
-                robot.claw(true);
-                break;
-            }
-
             case 2: {
-                robot.moveFourBar(140);
+                robot.moveFourBar(30);
+                robot.moveLift(1, 100);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 3: {
-                robot.moveFourBar(170);
+                robot.moveFourBar(50);
+                robot.moveLift(1, 275);
+                robot.claw(true);
                 break;
             }
 
             case 4: {
-                robot.moveFourBar(200);
+                robot.moveFourBar(50);
+                robot.moveLift(1, 450);
+                robot.claw(true);
                 break;
             }
 
             case 5: {
-                robot.moveFourBar(230);
+                robot.moveFourBar(50);
+                robot.moveLift(1, 620);
+                robot.claw(true);
                 break;
             }
         }
@@ -248,16 +297,37 @@ public class CycleLeftAuto extends LinearOpMode {
         robot.moveFourBar(0);
         sleep(500);
         robot.moveLift(1, 0);
-        sleep(1800);
+        sleep(600);
         robot.claw(true);}
 
     private void hold() {
         robot.claw(false);
         sleep(250);
-        robot.moveLift(1, 400);
-        robot.moveFourBar(150);}
+        robot.moveLift(1, 600);
+        robot.moveFourBar(0);}
 
     private static Pose2d poseMaker(Vector2d cord, double head) {
         return new Pose2d(cord.getX() + .01, cord.getY(), head);
+    }
+
+    private void posesRunthrough() {
+        prime();
+        sleep(2300);
+        score();
+        sleep(1800);
+        restFromScore();
+        restAtConeLevel(5);
+        sleep(2000);
+        restAtConeLevel(4);
+        sleep(2000);
+        restAtConeLevel(3);
+        sleep(2000);
+        restAtConeLevel(2);
+        sleep(2000);
+        restAtConeLevel(1);
+        sleep(2000);
+        intake();
+        hold();
+        sleep(2000);
     }
 }
