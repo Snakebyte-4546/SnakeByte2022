@@ -2,197 +2,241 @@ package org.firstinspires.ftc.teamcode.util.robot;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-
-import java.util.ArrayList;
 
 public class AutoMethods {
-    public DcMotor fl;
-    public DcMotor fr;
-    public DcMotor bl;
-    public DcMotor br;
-    public DcMotor lift;
+    // Drivetrain Motors
+    public DcMotorEx fl;
+    public DcMotorEx fr;
+    public DcMotorEx bl;
+    public DcMotorEx br;
 
+    // Scoring Assembly Motors
+    public DcMotorEx lift;
     public DcMotor lift2;
+    public DcMotorEx fourBar;
 
-    public DcMotor fourBar;
-
-    int ticks = 0;
-    double tickstodegs = 5;
-    public double fourbarPower = .6;
-    public int fBPos = 0;
-
+    // Servos
     public Servo claw;
 
+    // Variables
+    int ticks = 0;
+    final double tickstodegs = 5;
+    public final double fourbarPower = .6;
+    public int fBPos = 0;
+
+    // Camera Setup + PID
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
-    ElapsedTime PIDTimer = new ElapsedTime();
-    PIDCoefficients testPID = new PIDCoefficients(0,0,0);
-    double integral = 0;
 
+    // IMU
     public BNO055IMU imu;
     Orientation angles = new Orientation();
 
+    //  PID Setup
+    CustomPID lift_PID;
+    CustomPID fourBar_PID;
 
-    public AprilTagDetectionPipeline cameraSetup(LinearOpMode opMode) {
-        int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(opMode.hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagDetectionPipeline();
+    //oneClass implementation
+    double gravity = .05;
+    double lift_targetPosition;
+    double lift_errorTolerance = 40;
+    double lift_deltaError;
+    double lift_lastError = 0;
+    double lift_integral = 0;
+    ElapsedTime lift_PIDTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    public static PIDCoefficients lift_PIDCOEFFS = new PIDCoefficients(7, .0002, 1);
+    private final PIDCoefficients lift_pidGains = new PIDCoefficients(0, 0, 0);
 
-        camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
-            }
+    double fbar_targetPosition;
+    double fbar_errorTolerance = 30;
+    double fbar_deltaError;
+    double fbar_integral = 0;
+    double fbar_lastError = 0;
+    ElapsedTime fbar_PIDTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    public static PIDCoefficients fbar_PIDCOEFFS = new PIDCoefficients(2, .0008, 1);
+    private final PIDCoefficients fbar_pidGains = new PIDCoefficients(0, 0, 0);
 
-            @Override
-            public void onError(int errorCode) {
-                opMode.telemetry.addData("Camera Error:", errorCode);
-                opMode.telemetry.update();
-            }
-        });
-        return aprilTagDetectionPipeline;
-    }
-
-    public ArrayList<AprilTagDetection> getTag(AprilTagDetectionPipeline pipeline) {
-        return pipeline.getLatestDetections();
-    }
-
+    // Setup and Initialization
     public void ready(LinearOpMode auto) {
-        fl = auto.hardwareMap.dcMotor.get("fl");
-        fr = auto.hardwareMap.dcMotor.get("fr");
-        bl = auto.hardwareMap.dcMotor.get("bl");
-        br = auto.hardwareMap.dcMotor.get("br");
+
+
+        // Drivetrain Motors
+        fl = auto.hardwareMap.get(DcMotorEx.class, "fl");
+        fr = auto.hardwareMap.get(DcMotorEx.class, "fr");
+        bl = auto.hardwareMap.get(DcMotorEx.class, "bl");
+        br = auto.hardwareMap.get(DcMotorEx.class, "br");
         drivetrainSetup();
+
+
+        // Scoring Assembly Motors
+        lift = auto.hardwareMap.get(DcMotorEx.class, "lift");
+        fourBar = auto.hardwareMap.get(DcMotorEx.class, "4bar");
+
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        fourBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fourBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         resetEncoder();
 
-        lift = auto.hardwareMap.dcMotor.get("lift");
-        lift2 = auto.hardwareMap.dcMotor.get("lift2");
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
+        // Intake Servo
         claw = auto.hardwareMap.servo.get("claw");
         claw(false);
 
-        fourBar = auto.hardwareMap.dcMotor.get("4bar");
-        fourBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fourBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        resetLiftEncoder();
-
+        // IMU
         BNO055IMU imu = auto.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(parameters);
 
+
+        // PID controller
+        /*lift_PID = new CustomPID();
+        lift_PID.motorSetup(20, new PIDCoefficients(3, 0, 2));
+        fourBar_PID = new CustomPID();
+        fourBar_PID.motorSetup(10, new PIDCoefficients(1, 0, 10));
+        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());*/
     }
 
-    public double getGyroYaw() {
-        updateGyroValues();
-        return angles.firstAngle;
-    }
-
-    public void updateGyroValues() {
-        angles = imu.getAngularOrientation();
-    }
-    public void setMotorPower(double power) {
-        fl.setPower(power);
-        br.setPower(power);
-        fr.setPower(power);
-        bl.setPower(power);
-    }
-
-    public void setFourBar(int position) {
-        switch(position) {
-            case 0: {
-                fourBar.setTargetPosition(0);
-                fourBar.setPower(fourbarPower);
+    //Fourbar Methods
+    public void setFourBar(String position) {
+        switch (position) {
+            case "rest": {
+                moveFourBar(.07);
                 fBPos = 1;
                 break;
             }
-            case 1: {
-                fourBar.setTargetPosition(400);
-                fourBar.setPower(fourbarPower);
-                fBPos= 2;
+            case "hold": {
+                moveFourBar(.05);
+                fBPos = 2;
                 break;
             }
-            case 2: {
-                fourBar.setTargetPosition(680);
-                fourBar.setPower(fourbarPower);
+            case "front": {
+                moveFourBar(.4);
                 fBPos = 3;
                 break;
             }
-            case 3: {
-                fourBar.setTargetPosition(960);
-                fourBar.setPower(fourbarPower);
+            case "up": {
+                moveFourBar(.7);
+                fBPos = 4;
+                break;
+            }
+            case "back": {
+                moveFourBar(.96);
                 fBPos = 4;
                 break;
             }
         }
     }
 
-    public int getHeight(String code){
-        int returnHeight = 0;
-        if(code.equals("high")){
-            returnHeight = 4000;
-        }
-        else if(code.equals("mid")){
-            returnHeight = 3480;
-        }
-        else if(code.equals("low")){
-            returnHeight = 2000;
-        }
-        else if(code.equals("driving")){
-            returnHeight = 800;
-        }
-        else if(code.equals("s5")){
-            returnHeight = 230;
-        } else if(code.equals("s4")){
-            returnHeight = 200;
-        } else if(code.equals("s3")){
-            returnHeight = 170;
-        } else if(code.equals("s2")){
-            returnHeight = 140;
-        } else if(code.equals("s1")){
-            returnHeight = 110;
-        }
-        else{
-            returnHeight = 0;
-        }
-        return returnHeight;
+    public void moveFourBar(double position){
+        fbar_targetPosition = position * 950;
+        fbarThread.start();
+        //fourBar.setPower(0);
+        //fourBar.setPower(0);
+        //fourBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //fourBar.setTargetPosition(position);
+        //fourBar.setPower(1);
     }
 
+    public void setLift(String position) {
+        switch (position) {
+            case "rest": {
+                moveLift(0);
+                fBPos = 1;
+                break;
+            }
+            case "hold": {
+                moveLift(.3);
+                fBPos = 2;
+                break;
+            }
+
+            case "low": {
+                moveLift(.4);
+                fBPos = 3;
+                break;
+            }
+
+            case "mid": {
+                moveLift(.55);
+                fBPos = 3;
+                break;
+            }
+            case "high": {
+                moveLift(.93);
+                fBPos = 4;
+                break;
+            }
+        }
+    }
 
     // Lift positions and values
-    //  rest | up | score
+    //  rest | mid | up
     //       |    |
-    public void moveLift(double speed, int position) {
-        int ticks = position;
-        lift.setTargetPosition(-ticks);
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift.setPower(-speed);
-
-        lift2.setTargetPosition(-ticks);
-        lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift2.setPower(-speed);
+    public void moveLift(double position) {
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift_targetPosition = position * 2230;
+        liftThread.start();
+        //lift.setPower(0);
+        //lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //lift.setTargetPosition(position);
+        //lift.setPower(1);
     }
+
+    // Claw Method
+    public void claw(boolean isOpen) {
+        if(!isOpen){
+            claw.setPosition(0);
+
+        } else {
+            claw.setPosition(1);
+        }
+    }
+
+    // Backup (Non-Roadrunner) Drivetrain Methods
+    public void resetEncoder() {
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fourBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fourBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void drivetrainSetup() {
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        fl.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public int encoderAVG() {
+        int avg = Math.abs(fl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition());
+        return avg/2;
+    }
+
 
     public void MoveInchEncoder(double speed, double ticks) {
         resetEncoder();
@@ -225,75 +269,96 @@ public class AutoMethods {
         setMotorPower(0);
     }
 
-    public void claw(boolean isOpen) {
-        if(!isOpen){
-            claw.setPosition(0);
+    public void turn(double power) {
+        fl.setPower(power);
+        bl.setPower(power);
+        fr.setPower(-power);
+        br.setPower(-power);
+    }
 
-        } else {
-            claw.setPosition(1);
+    public double getGyroYaw() {
+        updateGyroValues();
+        return angles.firstAngle;
+    }
+
+    public void updateGyroValues() {
+        angles = imu.getAngularOrientation();
+    }
+
+    public void setMotorPower(double power) {
+        fl.setPower(power);
+        br.setPower(power);
+        fr.setPower(power);
+        bl.setPower(power);
+    }
+
+
+    public boolean liftAtTarget() {
+        return (lift.getCurrentPosition() >= (lift_targetPosition - lift_errorTolerance) && lift.getCurrentPosition() <= (lift_targetPosition + lift_errorTolerance)) && !(lift_deltaError >= 25);
+    }
+    private void PIDLift() {
+        lift_PIDTimer.reset();
+
+        double currentPosition = lift.getCurrentPosition();
+        double error = lift_targetPosition - currentPosition;
+        //telemetry.addLine("Error:  " + error);
+        //telemetry.addData("Error", error);
+
+        lift_deltaError = error - lift_lastError;
+        double derivative = lift_deltaError / lift_PIDTimer.time();
+
+        lift_integral += error * lift_PIDTimer.time();
+
+        lift_pidGains.kP = error * lift_PIDCOEFFS.kP;
+        lift_pidGains.kI = lift_integral * lift_PIDCOEFFS.kI;
+        lift_pidGains.kD = derivative * lift_PIDCOEFFS.kD;
+
+        lift.setVelocity(lift_pidGains.kP + lift_pidGains.kI + lift_pidGains.kD);
+        lift_lastError = error;
+    }
+    public boolean fbarAtTarget() {
+        return (fourBar.getCurrentPosition() >= (fbar_targetPosition - fbar_errorTolerance) && fourBar.getCurrentPosition() <= (fbar_targetPosition + fbar_errorTolerance)) && !(fbar_deltaError >= 25);
+    }
+    public void PIDfBar() {
+        fbar_PIDTimer.reset();
+
+        double currentPosition = fourBar.getCurrentPosition();
+        double error = fbar_targetPosition - currentPosition;
+        //telemetry.addLine("Error:  " + error);
+        //telemetry.addData("Error", error);
+
+        fbar_deltaError = error - fbar_lastError;
+        double derivative = fbar_deltaError / fbar_PIDTimer.time();
+
+        fbar_integral += error * fbar_PIDTimer.time();
+
+        fbar_pidGains.kP = error * fbar_PIDCOEFFS.kP;
+        fbar_pidGains.kI = fbar_integral * fbar_PIDCOEFFS.kI;
+        fbar_pidGains.kD = derivative * fbar_PIDCOEFFS.kD;
+
+        fourBar.setVelocity((fbar_pidGains.kP + fbar_pidGains.kI + fbar_pidGains.kD)) ;
+        fbar_lastError = error;
+    }
+
+    Thread liftThread = new Thread() {
+        public void run() {
+            while (!liftAtTarget() && isAlive()) {
+                PIDLift();
+            }
         }
-    }
-
-    public void resetEncoder() {
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void drivetrainSetup() {
-        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setDirection(DcMotorSimple.Direction.REVERSE);
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-    }
-
-    public void resetLiftEncoder() {
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fourBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fourBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public int encoderAVG() {
-        int avg = Math.abs(fl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition());
-        return avg/2;
-    }
-
-    public void turnPID(double targetAngle, double firstAngle){
-        double firstError = targetAngle - firstAngle;
-        double error = firstError;
-        double lastError = 0;
-        while (error < targetAngle){
-            error = getGyroYaw();
-            double changeInError = lastError - error;
-            integral += changeInError * PIDTimer.time();
-            double derivative = changeInError / PIDTimer.time();
-            double P = testPID.p * error;
-            double I = testPID.i * integral;
-            double D = testPID.d * derivative;
-            fl.setPower(P + I + D);
-            fr.setPower(-P + -I + -D);
-            bl.setPower(P + I + D);
-            br.setPower(-P + -I + -D);
-            error = lastError;
-            PIDTimer.reset();
+    };
+    Thread fbarThread = new Thread() {
+        public void run() {
+            while (!fbarAtTarget() && isAlive()) {
+                PIDfBar();
+            }
         }
+    };
 
+    public void killThreads() {
+        liftThread.interrupt();
+        fbarThread.interrupt();
     }
-    public void moveFourBar(int ticks){
-        fourBar.setTargetPosition(ticks);
-        fourBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fourBar.setPower(1);
-    }
-
 
 
 }
-

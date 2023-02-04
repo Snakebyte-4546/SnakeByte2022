@@ -42,6 +42,7 @@ public class TeleLib {
         fourbar = opMode.hardwareMap.dcMotor.get("4bar");
         fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fourbar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -135,6 +136,7 @@ public class TeleLib {
         }
     }
 
+
     public void claw(OpMode opMode) throws InterruptedException {
         if (opMode.gamepad2.right_bumper) {
             if (isClosed) {
@@ -216,14 +218,13 @@ public class TeleLib {
         double kD = 0;
         double kP = 1;
         double kI = 0;
-        double reference = targetPos;
         double integralSum = 0;
         double lastError = 0;
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        while(Math.abs(fourbar.getCurrentPosition()) < reference){
+        while(Math.abs(fourbar.getCurrentPosition()) < (double) targetPos){
             double encoderPos = fourbar.getCurrentPosition();
-            double error = reference - (encoderPos * Math.signum(reference));
+            double error = (double) targetPos - (encoderPos * Math.signum((double) targetPos));
             double derivative = (error -  lastError) / timer.seconds();
             integralSum = integralSum + (error * timer.seconds());
             double out = (kP * error) + (kI * integralSum) + (kD * derivative);

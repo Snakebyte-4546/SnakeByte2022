@@ -4,8 +4,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.openftc.apriltag.AprilTagDetection;
@@ -19,7 +19,7 @@ public class ParkAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         //Roadrunner Setup
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 

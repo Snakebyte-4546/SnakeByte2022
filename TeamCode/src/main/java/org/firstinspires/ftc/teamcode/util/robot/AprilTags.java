@@ -10,10 +10,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 public class AprilTags {
-    OpenCvCamera camera;
-    AprilTagDetectionPipeline aprilTagDetectionPipeline;
+    static OpenCvCamera camera;
+    static AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
-    public AprilTagDetectionPipeline cameraSetup(LinearOpMode opMode) {
+    public static AprilTagDetectionPipeline cameraSetup(LinearOpMode opMode) {
         int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(opMode.hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline();
@@ -34,7 +34,7 @@ public class AprilTags {
         return aprilTagDetectionPipeline;
     }
 
-    public ArrayList<AprilTagDetection> getTag(AprilTagDetectionPipeline pipeline) {
+    public static ArrayList<AprilTagDetection> getTag(AprilTagDetectionPipeline pipeline) {
         return pipeline.getLatestDetections();
     }
 

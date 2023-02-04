@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -27,9 +26,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive {
+public class MecanumDrive extends com.acmerobotics.roadrunner.drive.MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.7, .05, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, .02, 0);
 
@@ -74,7 +73,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    public MecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,

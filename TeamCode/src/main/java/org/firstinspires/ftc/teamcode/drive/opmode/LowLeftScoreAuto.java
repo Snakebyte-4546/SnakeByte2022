@@ -5,8 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
@@ -21,17 +21,39 @@ public class LowLeftScoreAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot.ready(this);
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
 
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence preloadToGoal = drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
-                    robot.moveLift(1,4000);
+                    robot.moveLift(3000);
+                    robot.setFourBar("front");
                 })
-                .lineTo(new Vector2d(-35,-40))
-                .lineTo((new Vector2d(-51,-29)))
+                .lineToLinearHeading(new Pose2d(-35,-24, Math.toRadians(180)))
+                .lineTo(new Vector2d(-30,-24))
+                .addDisplacementMarker(() ->{
+                    robot.claw(false);
+                    sleep(1000);
+                })
                 .build();
+        TrajectorySequence cycle = drive.trajectorySequenceBuilder(preloadToGoal.end())
+                .addDisplacementMarker(() -> {
+                    robot.claw(true);
+                    sleep(500);
+                    robot.setFourBar("rest");
+                    robot.moveLift(400);
+                })
+                .lineTo(new Vector2d(-35,-12))
+                .addDisplacementMarker(()->{
+                    robot.claw(false);
+                })
+                .lineTo(new Vector2d(-60,-12))
+                .addDisplacementMarker(()->{
+                    robot.claw(true);
+                })
+                .build()
+                ;
         TrajectorySequence backUp = drive.trajectorySequenceBuilder(preloadToGoal.end())
                 .lineTo(new Vector2d(-51,-36))
                 .build();
@@ -77,7 +99,7 @@ public class LowLeftScoreAuto extends LinearOpMode {
         waitForStart();
         drive.followTrajectorySequence(preloadToGoal);
         sleep(1500);
-        robot.claw(false);
+        robot.claw(true);
         sleep(1500);
         drive.followTrajectorySequence(backUp);
         if(tagOfInterest == 1){

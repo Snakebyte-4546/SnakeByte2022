@@ -5,9 +5,9 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name = "Low Score Right Auto", group = "Score Auto")
 public class LowRightScoreAuto extends LinearOpMode {
@@ -16,13 +16,13 @@ public class LowRightScoreAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         robot.ready(this);
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
 
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence preloadToGoal = drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
-                    robot.moveLift(1,4000);
+                    robot.moveLift(2000);
                 })
                 .lineTo(new Vector2d(-35,-40))
                 .lineTo((new Vector2d(-24,-28)))

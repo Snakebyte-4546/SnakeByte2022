@@ -5,8 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
@@ -24,7 +24,7 @@ public class SplineLeftAuto extends LinearOpMode {
 
         // Roadrunner Setup
         robot.ready(this);
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
 
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         Pose2d scorePose= new Pose2d(-29, -5, Math.toRadians(220));
@@ -160,10 +160,10 @@ public class SplineLeftAuto extends LinearOpMode {
 
     private void prime() {
         robot.claw(false);
-        robot.moveLift(1, 4000);
+        robot.moveLift(4000);
         robot.moveFourBar(660);}
     private void score() {
-        robot.moveLift(1, 4000);
+        robot.moveLift(4000);
         robot.moveFourBar(1000);
         sleep(500);
         robot.claw(true);
@@ -171,52 +171,52 @@ public class SplineLeftAuto extends LinearOpMode {
         robot.claw(false);}
     private void primeLow() {     //doesn't use fourbar for low goal
         robot.claw(false);
-        robot.moveLift(1, 4000);}
+        robot.moveLift(4000);}
 
     private void scoreLow() {     //doesn't use fourbar for low goal
-        robot.moveLift(1, 0);
+        robot.moveLift(0);
         robot.claw(false);}
 
     private void rest() {
-        robot.moveLift(1, 0);
+        robot.moveLift(0);
         robot.moveFourBar(0);
         robot.claw(true);}
 
     private void restAtConeLevel(int numCones) {
         switch (numCones) {
             case 0: {
-                robot.moveLift(1, 0);
+                robot.moveLift(0);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 1: {
-                robot.moveLift(1, 1000);
+                robot.moveLift(1000);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 2: {
-                robot.moveLift(1, 1200);
+                robot.moveLift(1200);
                 sleep(500);
                 robot.claw(true);
                 break;
             }
 
             case 3: {
-                robot.moveLift(1, 1400);
+                robot.moveLift(1400);
                 break;
             }
 
             case 4: {
-                robot.moveLift(1, 1600);
+                robot.moveLift(1600);
                 break;
             }
 
             case 5: {
-                robot.moveLift(1, 650);
+                robot.moveLift(650);
                 break;
             }
         }
@@ -225,13 +225,13 @@ public class SplineLeftAuto extends LinearOpMode {
     private void restFromScore() {
         robot.moveFourBar(0);
         sleep(500);
-        robot.moveLift(1, 0);
+        robot.moveLift(0);
         sleep(2000);
         robot.claw(true);}
 
     private void hold() {
         robot.claw(false);
         sleep(250);
-        robot.moveLift(1, 1300);
+        robot.moveLift(1300);
         robot.moveFourBar(0);}
     }

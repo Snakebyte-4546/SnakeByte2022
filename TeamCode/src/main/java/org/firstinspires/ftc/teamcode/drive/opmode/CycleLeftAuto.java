@@ -5,28 +5,26 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.robot.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.robot.AprilTags;
 import org.firstinspires.ftc.teamcode.util.robot.AutoMethods;
+import org.firstinspires.ftc.teamcode.drive.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
 @Autonomous(name = "Cycle Auto Left", group = "Score Auto")
 public class CycleLeftAuto extends LinearOpMode {
-
     int tagOfInterest = 0;
     AutoMethods robot = new AutoMethods();
     private int numCones;
 
     @Override
     public void runOpMode() {
-
         // Roadrunner Setup
+        MecanumDrive drive = new MecanumDrive(hardwareMap);
         robot.ready(this);
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         double  east = Math.toRadians(0);
         double  northEast = Math.toRadians(45);
@@ -49,9 +47,6 @@ public class CycleLeftAuto extends LinearOpMode {
         Pose2d neutral_pose      = new Pose2d(-35, -12,west);
         Vector2d neutral_vector = new Vector2d(-35, -12);
         drive.setPoseEstimate(start_pose);
-
-        //
-
 
         // Trajectory setup
 
@@ -142,11 +137,9 @@ public class CycleLeftAuto extends LinearOpMode {
 
         // Camera Setup
         AprilTags AprilTag = new AprilTags();
-        AprilTagDetectionPipeline aprilTagDetectionPipeline = AprilTag.cameraSetup(this);
-
 
         while (!isStarted() && !isStopRequested()) {
-            ArrayList<AprilTagDetection> currentDetections = AprilTag.getTag(aprilTagDetectionPipeline);
+            ArrayList<AprilTagDetection> currentDetections = AprilTag.getTag(AprilTag.cameraSetup(this));
 
             if (currentDetections.size() != 0) {
                 boolean tagFound = false;
@@ -170,36 +163,40 @@ public class CycleLeftAuto extends LinearOpMode {
                     telemetry.addLine("\nBut tag has been saved, Tag ID: " + tagOfInterest);
                 }
             }
-            telemetry.addData("Fourbar Position:", robot.fourBar.getCurrentPosition());
-            telemetry.addData("Claw Position:", robot.claw.getPosition());
+            //telemetry.addData("Fourbar Position:", robot.fourBar.getCurrentPosition());
+            //telemetry.addData("Claw Position:", robot.claw.getPosition());
             telemetry.update();
         }
 
         waitForStart();
 
-        hold();
-        drive.followTrajectorySequence(startToPickup); //score first cone
+        while (opModeIsActive() && !isStopRequested()) {
 
-        numCones--;
-        drive.followTrajectorySequence(scoreHigh); //scores again on high
-        drive.followTrajectorySequence(pickupToStart);
+            /*
+            hold();
+            drive.followTrajectorySequence(startToPickup); //score first cone
+
+            numCones--;
+            drive.followTrajectorySequence(scoreHigh); //scores again on high
+            drive.followTrajectorySequence(pickupToStart);
+            */
+            posesRunthrough();
+
+            //drive.followTrajectorySequence();
 
 
-
-
-        //drive.followTrajectorySequence();
-
-
-        if (tagOfInterest == 1) {
-            drive.followTrajectorySequence(park1);
-        } else if (tagOfInterest == 2) {
-            drive.followTrajectorySequence(park2);
-        } else if (tagOfInterest == 3) {
-            drive.followTrajectorySequence(park3);
+            if (tagOfInterest == 1) {
+                drive.followTrajectorySequence(park1);
+            } else if (tagOfInterest == 2) {
+                drive.followTrajectorySequence(park2);
+            } else if (tagOfInterest == 3) {
+                drive.followTrajectorySequence(park3);
+            } else {
+                //drive.followTrajectorySequence(neutralToStart);
+            }
+            PoseStorage.currentPose = drive.getPoseEstimate();
         }
-        else {
-            drive.followTrajectorySequence(neutralToStart);
-        }
+        //robot.killThreads();
     }
 
 
@@ -216,118 +213,134 @@ public class CycleLeftAuto extends LinearOpMode {
 
     private void prime() { //takes ~2300 ms
         robot.claw(false);
-        robot.moveLift(1, 4000);
-        robot.moveFourBar(660);}
+        robot.setFourBar("up");
+        robot.setLift("high");
+        sleep(2000);}
     private void score() {
-        robot.moveFourBar(1000);
-        sleep(300);
+        robot.setFourBar("back");
+        sleep(700);
         robot.claw(true);
         sleep(700);
         robot.claw(false);
-        prime();
-        sleep(750);
         restFromScore();}
 
     private void primeLow() {     //doesn't use fourbar for low goal
         robot.claw(false);
-        robot.moveLift(1, 4000);}
+        robot.setLift("mid");}
 
     private void scoreLow() {     //doesn't use fourbar for low goal
-        robot.moveLift(1, 0);
+        robot.moveLift(0);
         robot.claw(false);}
 
     private void rest() {
-        robot.moveLift(1, 0);
-        robot.moveFourBar(0);
-        robot.claw(true);}
+        robot.setFourBar("rest");
+        robot.claw(true);
+        robot.setLift("rest");}
 
     private void restAtConeLevel(int numCones) {
         switch (numCones) {
             case 0: {
-                robot.moveFourBar(50);
-                robot.moveLift(1, 600);
-                sleep(500);
-                robot.moveLift(1, 0);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(0);
                 break;
             }
 
             case 1: {
-                robot.claw(false);
-                sleep(250);
-                robot.moveLift(1, 600);
-                robot.moveFourBar(0);
-                sleep(500);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(.1);
                 break;
             }
 
             case 2: {
-                robot.moveFourBar(30);
-                robot.moveLift(1, 100);
-                sleep(500);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(.2);
                 break;
             }
 
             case 3: {
-                robot.moveFourBar(50);
-                robot.moveLift(1, 275);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(.3);
                 break;
             }
 
             case 4: {
-                robot.moveFourBar(50);
-                robot.moveLift(1, 450);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(.4);
                 break;
             }
 
             case 5: {
-                robot.moveFourBar(50);
-                robot.moveLift(1, 620);
+                robot.setFourBar("rest");
                 robot.claw(true);
+                robot.moveLift(.5);
                 break;
             }
         }
     }
 
     private void restFromScore() {
-        robot.moveFourBar(0);
-        sleep(500);
-        robot.moveLift(1, 0);
-        sleep(600);
-        robot.claw(true);}
+        robot.setFourBar("rest");
+        sleep(1000);
+        robot.claw(true);
+        robot.setLift("rest");}
 
     private void hold() {
         robot.claw(false);
-        sleep(250);
-        robot.moveLift(1, 600);
-        robot.moveFourBar(0);}
+        robot.setLift("hold");
+        robot.setFourBar("hold");}
 
     private static Pose2d poseMaker(Vector2d cord, double head) {
         return new Pose2d(cord.getX() + .01, cord.getY(), head);
     }
 
+
     private void posesRunthrough() {
+        telemetry.addLine("Prime");
+        telemetry.update();
         prime();
         sleep(2300);
+        telemetry.addLine("score");
+        telemetry.update();
         score();
         sleep(1800);
+        telemetry.addLine("Prime");
+        telemetry.update();
+        sleep(1800);
+        telemetry.addLine("Prime");
+        telemetry.update();
         restFromScore();
+        telemetry.addLine("Cone stack: 5");
+        telemetry.update();
         restAtConeLevel(5);
         sleep(2000);
+        telemetry.addLine("Cone stack: 4");
+        telemetry.update();
         restAtConeLevel(4);
         sleep(2000);
+        telemetry.addLine("Cone stack: 3");
+        telemetry.update();
         restAtConeLevel(3);
         sleep(2000);
+        telemetry.addLine("Cone stack: 2");
+        telemetry.update();
         restAtConeLevel(2);
         sleep(2000);
+        telemetry.addLine("Cone stack: 1");
+        telemetry.update();
         restAtConeLevel(1);
         sleep(2000);
+        telemetry.addLine("Intake");
+        telemetry.update();
         intake();
+        telemetry.addLine("Hold");
+        telemetry.update();
         hold();
         sleep(2000);
     }
+
 }

@@ -18,7 +18,7 @@ public class ConeAutomationPipeline extends OpenCvPipeline {
     Scalar lowHSV;
     Scalar highHSV;
     //TODO: Change this to the actual middle of the claw
-    Point clawLocation = new Point(0, 0);
+    public Point clawLocation = new Point(320, 120);
 
     public ConeAutomationPipeline(boolean isRed) {
         this.isRed = isRed;
