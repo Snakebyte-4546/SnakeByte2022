@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -24,18 +25,17 @@ public class ParkAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180)))
+                .lineTo(new Vector2d(-35, -15))
+                .lineTo(new Vector2d(-60, -11))
                 .build();
 
         TrajectorySequence park2 = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-36, -11, Math.toRadians(180)))
+                .lineTo(new Vector2d(-35, -15))
                 .build();
 
         TrajectorySequence park3 = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-12, -11, Math.toRadians(180)))
+                .lineTo(new Vector2d(-35, -15))
+                .lineTo(new Vector2d(-12, -14))
                 .build();
         // Camera Setup m,
         AprilTags AprilTag = new AprilTags();

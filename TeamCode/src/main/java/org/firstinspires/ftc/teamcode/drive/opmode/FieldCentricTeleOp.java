@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -20,8 +21,9 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 @TeleOp(group = "roadrunner")
 public class FieldCentricTeleOp extends LinearOpMode {
 
+
     public static double speed;
-    public static double LIFTSPEED = 50;
+    public static double LIFTSPEED = 150;
     public static int FOURBARSPEED = 100;
 
     public DcMotorEx lift;
@@ -34,7 +36,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
     Vector2d currentVector;
     double headingError;
-    static double targetHeading;
+    double targetHeading;
 
     //no
     double intendedHeading; //calculated from toutcchpad
@@ -129,6 +131,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
 
+
+            // Claw control Driver 2
             if (gamepad2.right_bumper) {
                 if (clawToogleCooldown.time() > 500){
                     if (claw.getPosition() == 0) claw.setPosition(1);
@@ -137,61 +141,62 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.ps) {
+            // Heading reset driver 1
+            if (gamepad1.ps || gamepad1.right_stick_button) {
                 drive.setPoseEstimate(new Pose2d(-30, 0, Math.toRadians(0)));
             }
 
+            // Robot Rest Driver 2
             if (gamepad2.left_bumper) {
                 gamepad2.rumbleBlips(1);
                 claw.setPosition(0);
-                fourbar.setTargetPosition(0);
-                fourbar.setPower(1);
                 lift_targetPosition = 0;
                 PIDLift();
+                fourbar.setTargetPosition(0);
+                fourbar.setPower(1);
             }
 
-            // speed calculations
-
+            // Drivetrain speed calculations
             if (gamepad1.right_trigger > 0.1) {
                 if (speed > .5) speed -= .02;          //half speed
-                if (speed < .5) speed += .02;}
+                if (speed < .5) speed += .02;
 
-            else if(gamepad1.left_trigger > 0.1){       //quarter speed
+            } else if(gamepad1.left_trigger > 0.1){       //quarter speed
                 if (speed > .28) speed -= .02;
-                else if (speed < .28) speed += .02;}
+                else if (speed < .28) speed += .02;
 
-            else {                                      //full speed
+            } else {                                      //full speed
                 if (speed < .7) speed += .04;
                 if (speed < 1) speed -= .02;
                 else if (speed > 1) speed += .02;}
             telemetry.addData("speed ", speed);
 
 
-            // make drivetrain inputs non linear
+            // make drivetrain inputs non linear, not used
             double ProcessedTranslationY = -gamepad1.left_stick_y;
             double ProcessedTranslationX = -gamepad1.left_stick_x;
 
 
-            // movement calc
+            // Movement calc Driver 1
+
             currentVector = new Vector2d(0, 0).rotated(-drive.getPoseEstimate().getHeading());
-            ;
 
             if (gamepad1.dpad_up) {
                 currentVector = new Vector2d(speed,
                         0).rotated(-drive.getPoseEstimate().getHeading());
-                gamepad1.rumbleBlips(1);
+                gamepad1.rumble(200);
             } else if (gamepad1.dpad_down) {
                 currentVector = new Vector2d(-speed,
                         0).rotated(-drive.getPoseEstimate().getHeading());
-                gamepad1.rumbleBlips(1);
+                gamepad1.rumble(200);
             } else if (gamepad1.dpad_left) {
                 currentVector = new Vector2d(0,
                         speed).rotated(-drive.getPoseEstimate().getHeading());
-                gamepad1.rumbleBlips(1);
+                gamepad1.rumble(200);
             } else if (gamepad1.dpad_right) {
                 currentVector = new Vector2d(0,
                         -speed).rotated(-drive.getPoseEstimate().getHeading());
-                gamepad1.rumbleBlips(1);
+                gamepad1.rumble(200);
             } else if (gamepad1.right_trigger > .3) {
                 currentVector = new Vector2d(-gamepad1.left_stick_y * speed,
                         -gamepad1.left_stick_x * speed).rotated(-drive.getPoseEstimate().getHeading());
@@ -201,90 +206,40 @@ public class FieldCentricTeleOp extends LinearOpMode {
             }
             gamepad1.rumble((int)(Math.abs(gamepad1.left_stick_x * (speed * 100) + Math.abs(gamepad1.left_stick_y * (speed * 100)))));
 
-            //heading calc
 
-            /*if (gamepad1.touchpad) {
-                HeadingCalculator_Angle(drive, Math.toDegrees(drive.getExternalHeading()) + gamepad1.touchpad_finger_1_x * speed);
+
+            //Heading calc Driver 1
+            if (gamepad1.left_bumper) {
+                drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading() - Math.toRadians(2)));
             }
-            FieldcentricMode = true;
-            headingError = 0;
-        if (gamepad1.cross) {
-            pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, 180));
-            targetHeading = 180;
-            FieldcentricMode = false;
-        } else if (gamepad1.circle) {
-            pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, 270));
-            targetHeading = 270;
-            FieldcentricMode = false;
-        }
-        if (gamepad1.triangle) {
-            pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, 0));
-            targetHeading = 0;
-            FieldcentricMode = false;
-        }
-        if (gamepad1.square) {
-            pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, 90));
-            targetHeading = 90;
-            FieldcentricMode = false;
-        }
-
-        if (gamepad1.right_stick_x > .05 || gamepad1.right_stick_x < -.05 || gamepad1.right_stick_y > .05 || gamepad1.right_stick_y < -.05) {
-            pose = new Pose2d(currentVector, HeadingCalculator_InputLock(drive));
-            FieldcentricMode = true;
-        }
-        if (FieldcentricMode) {
-            pose = new Pose2d(currentVector, HeadingCalculator_InputLock(drive));
-        } else {
-            pose = new Pose2d(currentVector, HeadingCalculator_InputLock(drive));
-        }
-        drive.setWeightedDrivePower(
-                new Pose2d(currentVector, 0));
-        drive.update();*/
-
-            /*if (gamepad1.right_stick_x > .5 || gamepad1.right_stick_x < -.5 || gamepad1.right_stick_y > .5 || gamepad1.right_stick_y < -.5) {
-                if (!alreadyRegistered) {
-                    alreadyRegistered = true;
-                    timeSincePress.reset();
-                    gamepad1.rumbleBlips(1);
-                }
+            else if (gamepad1.right_bumper) {
+                drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading() + Math.toRadians(2)));
             }
-            else alreadyRegistered = false;
 
-
-            //the heading calculations for touchpad
-            if (alreadyRegistered) { //if pressing the touchpad
-                angle =  (360 - (Math.toDegrees(Math.atan2(gamepad1.right_stick_x, gamepad1.right_stick_y)))) - 360;
-                if (angle < 0) angle = angle + 360;
-                if (timeSincePress.time() < TimeTillHold) {
-                    targetHeading = angle;
-                    pose = new Pose2d(currentVector,  HeadingCalculator_Angle(drive, targetHeading));
-                }
-                else {pose = new Pose2d(currentVector, HeadingCalculator_FieldCentric(drive));}
-            }
-            else if (timeSincePress.time() < 1000) {pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, angle));}*/
-
-            if (gamepad1.triangle || gamepad1.square || gamepad1.cross || gamepad1.circle) {
-                gamepad1.rumbleBlips(1);
+            // Driver 1 heading snap, fallback to stick control
                 if (gamepad1.triangle) angle = 0;
                 else if (gamepad1.square) angle = 90;
                 else if (gamepad1.cross) angle = 180;
                 else if (gamepad1.circle) angle = 270;
-                targetHeading = angle;
+                else if (gamepad1.right_stick_x >.05 || gamepad1.right_stick_x < -.05 || gamepad1.right_stick_y >.05 || gamepad1.right_stick_y < -.05) {
+                    angle = Math.toDegrees(Math.atan2(gamepad1.right_stick_x, gamepad1.right_stick_y)) + 180;
+                    timeFromLastInput.reset();
+                    } /*else if (timeFromLastInput.time() > 500) {
+                    angle = Math.toDegrees(drive.getExternalHeading());}*/
+            targetHeading = angle;
                 pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, angle));
-            }
-            else pose = new Pose2d(currentVector, HeadingCalculator_InputLock(drive));
             drive.setWeightedDrivePower(
                     pose);
             drive.update();
 
 
-            //lift & fourbar pos
+            //lif pos set Driver 2
             if (gamepad2.dpad_up && lift_targetPosition < 2300) {          //manual up
-                gamepad1.rumble(2);
+                gamepad2.rumble(2);
                 lift_targetPosition += LIFTSPEED;
             }
             if (gamepad2.dpad_down && lift_targetPosition > -100) {
-                gamepad1.rumble(2);//manual down
+                gamepad2.rumble(2);//manual down
                 lift_targetPosition += -LIFTSPEED;
             }
             if (gamepad2.dpad_right) {
@@ -298,20 +253,19 @@ public class FieldCentricTeleOp extends LinearOpMode {
             PIDLift();
 
 
-            //lift manual for driver 2
-
+            //four bar manual for driver 2
             if (gamepad2.right_stick_y > .04 || gamepad2.right_stick_y < -.04) {
-                claw.setPosition(0);
-                fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                fourbar.setPower(gamepad2.right_stick_y);
-            }   else if (gamepad2.a) {  //fbar rest
+                claw.setPosition(fourbar.getCurrentPosition() + gamepad2.right_stick_y * 2);
+                fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }   else if (gamepad2.a) {  //four bar pos
                 claw.setPosition(0);
                 if (pressFBar) {
-                    fourbarFindRest(drive);
+                    fourbar.setTargetPosition(-300);
+                    fourbar.setPower(17889);
                     fbarHoldLow.reset();
                     pressFBar = false;
-                } else if (fbarHoldLow.time() < 1000) {
-                } else if (fbarHoldLow.time() > 1000) {
+                } else if (fbarHoldLow.time() < 500) {
+                } else if (fbarHoldLow.time() > 500) {
                     fourbar_targetPosition = fourbar_targetPosition - 20;
                 }
                 //fbar_targetPosition = 40;
@@ -371,7 +325,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
         }
         else {
             headingError = targetHeading - actualHeading;
-            //gamepad1.rumble((int)headingError);
+            //gamepad1.rumble((int)headingError * 4);
 
         }
         if (headingError > 180) headingError = targetHeading-360 -  actualHeading;
@@ -408,9 +362,9 @@ public class FieldCentricTeleOp extends LinearOpMode {
     public double HeadingCalculator_Angle(MecanumDrive drive, double targetHeading) {
         double actualHeading = Math.toDegrees(drive.getExternalHeading());
         headingError = targetHeading -  actualHeading;
-        gamepad1.rumble((int)headingError);
-        if (headingError > 180) headingError = targetHeading-360 -  actualHeading;
-        else if (headingError <  -180) headingError = targetHeading+360- actualHeading;
+        //gamepad1.rumble((int)headingError);
+        if (headingError > 180) {headingError = targetHeading-360 -  actualHeading;}
+        else if (headingError <  -180) {headingError = targetHeading+360- actualHeading;}
         return Math.toRadians(headingError);
     }
 
