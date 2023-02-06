@@ -98,3 +98,6 @@ lint/tmp/
 .AppleDouble
 .LSOverride
 ._*
+java_pid18137.hprof
+*.hprof
+*.hprof
