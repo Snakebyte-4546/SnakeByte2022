@@ -69,11 +69,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
     //lift & fourbar pid
     int fourbar_targetPosition = 0;
 
-    ElapsedTime clawToggleCooldown;
-
-    //for heading calculations
-    boolean FieldcentricMode = true;
-
 
     static double lift_targetPosition = 0;
     double lift_errorTolerance = 10;
@@ -87,14 +82,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
     static double fbar_targetPosition = 0;
     double fbar_errorTolerance = 30;
     double fbar_deltaError;
-    double fbar_integral = 0;
-    double fbar_lastError = 0;
     ElapsedTime fbarHoldLow = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     boolean firstLoopPressed;
-    public static PIDCoefficients fbar_PIDCOEFFS = new PIDCoefficients(5, 0, 3);
-    private final PIDCoefficients fbar_pidGains = new PIDCoefficients(0, 0, 0);
-    ElapsedTime clawToogleCooldown = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-
 
     //camera stuff
     //OpenCvWebcam camera;
@@ -169,17 +158,18 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             // Drivetrain speed calculations
             if (gamepad1.right_trigger > 0.1) {
-                if (speed > .5) speed -= .02;          //half speed
-                if (speed < .5) speed += .02;
+                if (speed > .28) speed -= .02;          //half speed
+                if (speed < .28) speed += .02;
 
-            } else if(gamepad1.left_trigger > 0.1){       //quarter speed
-                if (speed > .28) speed -= .02;
-                else if (speed < .28) speed += .02;
+            } else if (gamepad1.left_trigger > 0.1) {       // 1/5 speed
+                if (speed > .1) speed -= .02;
+                else if (speed < .1) speed += .02;
 
             } else {                                      //full speed
                 if (speed < .7) speed += .04;
                 if (speed < maxSpeed) speed -= .02;
-                else if (speed > maxSpeed) speed += .02;}
+                else if (speed > maxSpeed) speed += .02;
+            }
             telemetry.addData("speed ", speed);
 
 
@@ -193,74 +183,84 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
             currentVector = new Vector2d(0, 0).rotated(-drive.getPoseEstimate().getHeading());
 
-            if (gamepad1.dpad_up) { //add rotated to make them fieldcentric
-                currentVector = new Vector2d(-speed,
-                        0);
-                gamepad1.rumble(200);
-            } else if (gamepad1.dpad_down) {
-                currentVector = new Vector2d(-speed,
-                        0);
-                gamepad1.rumble(200);
-            } else if (gamepad1.dpad_left) {
-                currentVector = new Vector2d(0,
-                        speed);
-                gamepad1.rumble(200);
-            } else if (gamepad1.dpad_right) {
-                currentVector = new Vector2d(0,
-                        -speed);
-                gamepad1.rumble(200);
-            } else if (gamepad1.right_trigger > .3) {
-                currentVector = new Vector2d(-gamepad1.left_stick_y * speed,
-                        -gamepad1.left_stick_x * speed).rotated(-drive.getPoseEstimate().getHeading());
-            } else {
+            if (gamepad1.options) {   //if holding options, makes d-pad move fieldcentricly
+                if (gamepad1.dpad_up) { //add rotated to make them fieldcentric
+                    currentVector = new Vector2d(speed,
+                            0).rotated(-drive.getPoseEstimate().getHeading());
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_down) {
+                    currentVector = new Vector2d(-speed,
+                            0).rotated(-drive.getPoseEstimate().getHeading());
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_left) {
+                    currentVector = new Vector2d(0,
+                            speed).rotated(-drive.getPoseEstimate().getHeading());
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_right) {
+                    currentVector = new Vector2d(0,
+                            -speed).rotated(-drive.getPoseEstimate().getHeading());
+                    gamepad1.rumble(200);
+                }
+            } else {  //otherwise move based on robot movement
+                if (gamepad1.dpad_up) { //add rotated to make them fieldcentric
+                    currentVector = new Vector2d(speed,
+                            0);
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_down) {
+                    currentVector = new Vector2d(-speed,
+                            0);
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_left) {
+                    currentVector = new Vector2d(0,
+                            speed);
+                    gamepad1.rumble(200);
+                } else if (gamepad1.dpad_right) {
+                    currentVector = new Vector2d(0,
+                            -speed);
+                    gamepad1.rumble(200);
+                } else { // STICK HEADING
+                    targetVector = new Vector2d(targetVector.getX() + (-gamepad1.left_stick_y * speed),
+                            targetVector.getY() + (-gamepad1.left_stick_x * speed));
 
-                //STICK CODE
-
-                targetVector = new Vector2d(targetVector.getX() + (-gamepad1.left_stick_y * speed),
-                        targetVector.getY() + (-gamepad1.left_stick_x * speed));
-
-                //error from target vector to robot
-                //double xError = targetVector.getX() - drive.getPoseEstimate().getX();      //THIS IS NEW, MIGHT BREAK LEFT STICK
-                //double yError = targetVector.getY() - drive.getPoseEstimate().getY();
-                //if (xError < 15) xError = 0;
-                //if (yError < 15) yError = 0;
-                currentVector = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-drive.getPoseEstimate().getHeading());
-                //currentVector = new Vector2d(xError, yError).rotated(-drive.getPoseEstimate().getHeading());
+                    currentVector = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-drive.getPoseEstimate().getHeading());
+                    //currentVector = new Vector2d(xError, yError).rotated(-drive.getPoseEstimate().getHeading());
 
                 /*currentVector = new Vector2d(-gamepad1.left_stick_y * speed,
                         -gamepad1.left_stick_x * speed).rotated(-drive.getPoseEstimate().getHeading());*/
+                }
             }
 
             // THINGS IMPACTED BY MOVMENT
-            gamepad1.rumble((int)(Math.abs(gamepad1.left_stick_x * (speed * 100) + Math.abs(gamepad1.left_stick_y * (speed * 100)))));
-            if (liftMax < ((int)(Math.abs(gamepad1.left_stick_x * (speed * 2000) + Math.abs(gamepad1.left_stick_y * (speed * 2000)))))){
+            gamepad1.rumble((int) (Math.abs(gamepad1.left_stick_x * (speed * 100) + Math.abs(gamepad1.left_stick_y * (speed * 100)))));
+            if (liftMax < ((int) (Math.abs(gamepad1.left_stick_x * (speed * 2000) + Math.abs(gamepad1.left_stick_y * (speed * 2000)))))) {
                 liftMax += 10;
-            }
-            else {liftMax = 2050 - ((int)(Math.abs(gamepad1.left_stick_x * (speed * 2000) + Math.abs(gamepad1.left_stick_y * (speed * 2000)))));}                    //NEW TESTING
-
+            } else {
+                liftMax = 2050 - ((int) (Math.abs(gamepad1.left_stick_x * (speed * 2000) + Math.abs(gamepad1.left_stick_y * (speed * 2000)))));
+            }                    //NEW TESTING
 
 
             //heading true north Tuning
             if (gamepad1.left_bumper) {
                 drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading() - Math.toRadians(speed * 2.2)));
-            }
-            else if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper) {
                 drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading() + Math.toRadians(speed * 2.2)));
             }
 
             //Heading calc Driver 1
             // Driver 1 heading snap, fallback to stick control
-                if (gamepad1.triangle) angle = 0;
-                else if (gamepad1.square) angle = 90;
-                else if (gamepad1.cross) angle = 180;
-                else if (gamepad1.circle) angle = 270;
-                else if (gamepad1.right_stick_x >.05 || gamepad1.right_stick_x < -.05 || gamepad1.right_stick_y >.05 || gamepad1.right_stick_y < -.05) {
-                    angle = Math.toDegrees(Math.atan2(gamepad1.right_stick_x, gamepad1.right_stick_y)) + 180;
-                    timeFromLastInput.reset();
-                    } /*else if (timeFromLastInput.time() > 500) {
+            if (gamepad1.touchpad) {  //touchpad controlled heading adjust
+                angle += gamepad1.touchpad_finger_1_x * 16;
+            } else if (gamepad1.triangle) angle = 0;
+            else if (gamepad1.square) angle = 90;
+            else if (gamepad1.cross) angle = 180;
+            else if (gamepad1.circle) angle = 270;
+            else if (gamepad1.right_stick_x > .05 || gamepad1.right_stick_x < -.05 || gamepad1.right_stick_y > .05 || gamepad1.right_stick_y < -.05) {
+                angle = Math.toDegrees(Math.atan2(gamepad1.right_stick_x, gamepad1.right_stick_y)) + 180;
+                timeFromLastInput.reset();
+            } /*else if (timeFromLastInput.time() > 500) {
                     angle = Math.toDegrees(drive.getExternalHeading());}*/
             targetHeading = angle;
-                pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, angle));
+            pose = new Pose2d(currentVector, HeadingCalculator_Angle(drive, angle));
             drive.setWeightedDrivePower(
                     pose);
             drive.update();
@@ -269,8 +269,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             //lif pos set Driver 2
             if (lift.getCurrentPosition() > liftMax + 50) {
                 lift_targetPosition = liftMax;
-            }
-             else if (gamepad2.dpad_up && lift_targetPosition < 2000) {          //manual control with up/down
+            } else if (gamepad2.dpad_up && lift_targetPosition < 2000) {          //manual control with up/down
                 gamepad2.rumble(2);
                 lift_targetPosition += LIFTSPEED;
                 liftTarget = (int) lift_targetPosition;
@@ -286,20 +285,19 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 gamepad2.rumbleBlips(1);
                 lift_targetPosition = -20;
                 liftTarget = (int) lift_targetPosition;
-            }
-             else {
+            } else {
                 lift_targetPosition = liftTarget;
             }
             PIDLift();
-            gamepad2.rumble((int)liftError);
+            gamepad2.rumble((int) liftError);
 
 
             //four bar manual for driver 2
             if (gamepad2.right_stick_y > .04 || gamepad2.right_stick_y < -.04) {
                 //claw.setPosition(0);
-                fourbar.setTargetPosition((int)(fourbar.getCurrentPosition() + gamepad2.right_stick_y * 20));
+                fourbar.setTargetPosition((int) (fourbar.getCurrentPosition() + gamepad2.right_stick_y * 20));
                 fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }   else if (gamepad2.a) {  //four bar down / reset base lower if hold
+            } else if (gamepad2.a) {  //four bar down / reset base lower if hold
                 //claw.setPosition(0);
                 if (firstLoopPressed) {
                     fourbar_targetPosition = 0;
@@ -312,16 +310,17 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 }
             } else if (!firstLoopPressed) {
                 firstLoopPressed = true;
-                fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
-            else if (gamepad2.b && fourbar.getCurrentPosition() > -0) {
+                fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            } else if (gamepad2.b && fourbar.getCurrentPosition() > -0) {
                 //claw.setPosition(0);//fourbar front
-                fourbar_targetPosition = fourbar.getCurrentPosition() - FOURBARSPEED;}
-            else if (gamepad2.y) {//fourbar up
+                fourbar_targetPosition = fourbar.getCurrentPosition() - FOURBARSPEED;
+            } else if (gamepad2.y) {//fourbar up
                 //claw.setPosition(0);
-                fourbar_targetPosition = 1000;}
-            else if (gamepad2.x && fourbar.getCurrentPosition() < 1050) {
+                fourbar_targetPosition = 1000;
+            } else if (gamepad2.x && fourbar.getCurrentPosition() < 1050) {
                 //claw.setPosition(0);//fourbar back
-                fourbar_targetPosition = fourbar.getCurrentPosition() + FOURBARSPEED;}
+                fourbar_targetPosition = fourbar.getCurrentPosition() + FOURBARSPEED;
+            }
 
             fourbar.setTargetPosition(fourbar_targetPosition);
             fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -346,7 +345,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
 
         }
-
     }
 
     public double HeadingCalculator_InputLock(MecanumDrive drive) {
@@ -366,7 +364,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
         }
         if (headingError > 180) headingError = targetHeading-360 -  actualHeading;
         else if (headingError <  -180) headingError = targetHeading+360- actualHeading;
-
         return Math.toRadians(headingError);
     }
 
@@ -427,9 +424,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
         lift.setVelocity(lift_pidGains.kP + lift_pidGains.kI + lift_pidGains.kD);
         lift_lastError = liftError;
-    }
-    public boolean fbarAtTarget() {
-        return (fourbar.getCurrentPosition() >= (fbar_targetPosition - fbar_errorTolerance) && fourbar.getCurrentPosition() <= (fbar_targetPosition + fbar_errorTolerance)) && !(fbar_deltaError >= 25);
     }
 }
 
