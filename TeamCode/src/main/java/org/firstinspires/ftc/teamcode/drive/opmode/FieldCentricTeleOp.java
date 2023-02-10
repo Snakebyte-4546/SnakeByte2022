@@ -155,7 +155,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 fourbar.setTargetPosition(0);
                 fourbar.setPower(1);
             }
-
             // Drivetrain speed calculations
             if (gamepad1.right_trigger > 0.1) {
                 if (speed > .28) speed -= .02;          //half speed
@@ -206,19 +205,23 @@ public class FieldCentricTeleOp extends LinearOpMode {
                     currentVector = new Vector2d(speed,
                             0);
                     gamepad1.rumble(200);
-                } else if (gamepad1.dpad_down) {
+                }
+                else if (gamepad1.dpad_down) {
                     currentVector = new Vector2d(-speed,
                             0);
                     gamepad1.rumble(200);
-                } else if (gamepad1.dpad_left) {
+                }
+                else if (gamepad1.dpad_left) {
                     currentVector = new Vector2d(0,
                             speed);
                     gamepad1.rumble(200);
-                } else if (gamepad1.dpad_right) {
+                }
+                else if (gamepad1.dpad_right) {
                     currentVector = new Vector2d(0,
                             -speed);
                     gamepad1.rumble(200);
-                } else { // STICK HEADING
+                }
+                else { // STICK HEADING
                     targetVector = new Vector2d(targetVector.getX() + (-gamepad1.left_stick_y * speed),
                             targetVector.getY() + (-gamepad1.left_stick_x * speed));
 
