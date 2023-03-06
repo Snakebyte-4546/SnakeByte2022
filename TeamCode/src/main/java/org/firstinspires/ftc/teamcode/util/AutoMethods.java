@@ -28,8 +28,7 @@ public class AutoMethods {
     int ticks = 0;
     double tickstodegs = 22.75;
 
-    public Servo right;
-    public Servo left;
+    public Servo claw;
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -84,8 +83,7 @@ public class AutoMethods {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         resetLiftEncoder();
 
-        right = auto.hardwareMap.servo.get("rightServo");
-        left = auto.hardwareMap.servo.get("leftServo");
+        claw = auto.hardwareMap.servo.get("claw");
         clamp(true);
 
         BNO055IMU imu = auto.hardwareMap.get(BNO055IMU.class, "imu");
@@ -229,11 +227,9 @@ public class AutoMethods {
 
     public void clamp(boolean isOpen) {
         if(!isOpen){
-            right.setPosition(1);
-            left.setPosition(0);
+            claw.setPosition(1);
         } else {
-            right.setPosition(.5);
-            left.setPosition(.5);
+            claw.setPosition(.5);
         }
     }
 
