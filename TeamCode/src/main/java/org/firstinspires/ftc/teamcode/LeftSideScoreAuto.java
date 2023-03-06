@@ -54,7 +54,7 @@ public class LeftSideScoreAuto extends LinearOpMode {
         }
 
         robot.ready(this);
-        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-35, -64);
         drive.setPoseEstimate(startPose);
         TrajectorySequence preloadToGoal = drive.trajectorySequenceBuilder(startPose)
                 .lineTo(new Vector2d(-35,-35))
