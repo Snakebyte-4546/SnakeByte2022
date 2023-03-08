@@ -89,7 +89,7 @@ public class TeleLib {
         }
     }
 
-    public void lift(OpMode opMode) {
+    public void lift(OpMode opMode) throws InterruptedException {
         if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
             if (opMode.gamepad2.right_trigger > .2) {
                 lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -123,11 +123,8 @@ public class TeleLib {
             opMode.telemetry.addData("isOpen", isOpen);
             opMode.telemetry.update();
             while (opMode.gamepad2.right_bumper) {
-                opMode.telemetry.addData("CLAW INTERRUPT:", "ACTIVE");
-                opMode.telemetry.update();
+                Thread.sleep(100);
             }
-            opMode.telemetry.addData("CLAW INTERRUPT:", "INACTIVE");
-            opMode.telemetry.update();
         }
         opMode.telemetry.addData("Lift target pos: ", liftPos);
         opMode.telemetry.addData("Lift current position: ", lift.getCurrentPosition());

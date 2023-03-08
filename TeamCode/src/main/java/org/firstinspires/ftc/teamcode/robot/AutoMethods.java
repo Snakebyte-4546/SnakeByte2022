@@ -30,16 +30,16 @@ public class AutoMethods {
     public int getHeight(String code){
         int returnHeight = 0;
         if(code.equals("high")){
-            returnHeight = 4960;
+            returnHeight = 1900;
         }
         else if(code.equals("mid")){
-            returnHeight = 3480;
+            returnHeight = 1300;
         }
         else if(code.equals("low")){
-            returnHeight = 2000;
+            returnHeight = 800;
         }
         else if(code.equals("driving")){
-            returnHeight = 800;
+            returnHeight = 0;
         }
         else if(code.equals("s5")){
             returnHeight = 850;
