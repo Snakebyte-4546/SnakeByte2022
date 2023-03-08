@@ -49,9 +49,9 @@ public class LeftSideScore extends LinearOpMode {
 
         waitForStart();
         robot.ready(this);
-        Pose2d startPose = new Pose2d(-35, -64);
-        Pose2d scorePose = new Pose2d(-28, -8);
-        Pose2d stackPose = new Pose2d(-58,-12.25);
+        Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
+        Pose2d scorePose = new Pose2d(-28, -8, Math.toRadians(65));
+        Pose2d stackPose = new Pose2d(-58,-12.25, Math.toRadians(180));
 
         drive.setPoseEstimate(startPose);
         TrajectorySequence scorePreload = drive.trajectorySequenceBuilder(startPose)
@@ -64,7 +64,7 @@ public class LeftSideScore extends LinearOpMode {
                 .lineTo(new Vector2d(-58,-12.25))
                 .build();
 
-        TrajectorySequence goToPole = drive.trajectorySequenceBuilder(scorePose)
+        TrajectorySequence goToPole = drive.trajectorySequenceBuilder(stackPose)
                 .lineToLinearHeading(new Pose2d(-40,-12.25, Math. toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-28,-8, Math.toRadians(65)))
                 .build();

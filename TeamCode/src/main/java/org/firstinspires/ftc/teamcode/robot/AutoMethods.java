@@ -57,8 +57,8 @@ public class AutoMethods {
 
     public void moveLift(double speed, String position) {
         ticks = getHeight(position);
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setTargetPosition(-ticks);
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setPower(-speed);
     }
 
