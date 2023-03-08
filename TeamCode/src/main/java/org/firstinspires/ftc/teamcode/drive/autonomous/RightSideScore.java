@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.drive.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 import org.firstinspires.ftc.teamcode.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.robot.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
-
 import java.util.ArrayList;
 
 
@@ -15,7 +13,6 @@ import java.util.ArrayList;
 @Autonomous(name = "Right Side Auto", group = "Score Auto")
 public class RightSideScore extends LinearOpMode {
     AutoMethods robot = new AutoMethods();
-
     int tagOfInterest = 0;
 
     @Override
@@ -56,40 +53,16 @@ public class RightSideScore extends LinearOpMode {
 
         while(!isStopRequested() && opModeIsActive()){
             if(tagOfInterest == 1){
-                robot.MoveInchEncoder(-.25,650);
-                robot.Strafe(.25, 400);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25, 60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.25, 60);
-                robot.Strafe(.25,  250);
+
             } else if(tagOfInterest == 2){
-                robot.Strafe(.25, 1050);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(.25,  250);
+
             } else if (tagOfInterest == 3) {
-                robot.Strafe(.25, 1050);
-                robot.moveLift(.5, "high");
-                sleep(200);
-                robot.MoveInchEncoder(.25,60);
-                robot.clamp(false);
-                sleep(200);
-                robot.MoveInchEncoder(-.5,60);
-                robot.Strafe(-.25,  250);
-                robot.MoveInchEncoder(1, 650);
+
             } else {
                 telemetry.clearAll();
                 telemetry.addLine("FATAL ERROR: NO TAGS FOUND");
                 telemetry.update();
             }
-            robot.setMotorPower(0);
         }
     }
 }

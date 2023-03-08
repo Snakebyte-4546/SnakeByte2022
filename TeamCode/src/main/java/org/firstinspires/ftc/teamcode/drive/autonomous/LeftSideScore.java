@@ -3,15 +3,12 @@ package org.firstinspires.ftc.teamcode.drive.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.robot.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.robot.AutoMethods;
 import org.openftc.apriltag.AprilTagDetection;
-
 import java.util.ArrayList;
 
 
@@ -22,13 +19,11 @@ public class LeftSideScore extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Camera Setup
         AutoMethods robot = new AutoMethods();
         AprilTagDetectionPipeline aprilTagDetectionPipeline = robot.cameraSetup(this);
         MecanumDrive drive = new MecanumDrive(hardwareMap);
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = robot.getTag(aprilTagDetectionPipeline);
-
             if (currentDetections.size() != 0) {
                 boolean tagFound = false;
                 for (AprilTagDetection tag : currentDetections) {
@@ -43,7 +38,6 @@ public class LeftSideScore extends LinearOpMode {
                 }
             } else {
                 telemetry.addLine("Tag not currently found: ");
-
                 if (tagOfInterest == 0) {
                     telemetry.addLine("(no tags have been seen)");
                 } else {
@@ -53,16 +47,36 @@ public class LeftSideScore extends LinearOpMode {
             telemetry.update();
         }
 
+        waitForStart();
         robot.ready(this);
         Pose2d startPose = new Pose2d(-35, -64);
+        Pose2d scorePose = new Pose2d(-28, -8);
+        Pose2d stackPose = new Pose2d(-58,-12.25);
+
         drive.setPoseEstimate(startPose);
-        TrajectorySequence preloadToGoal = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence scorePreload = drive.trajectorySequenceBuilder(startPose)
                 .lineTo(new Vector2d(-35,-35))
-                //.splineTo(new Vector2d(-28,-8), Math.toRadians(65))
+                .splineTo(new Vector2d(-28,-8), Math.toRadians(65))
+                .build();
+
+        TrajectorySequence goToStack = drive.trajectorySequenceBuilder(scorePose)
+                .lineToLinearHeading(new Pose2d(-38,-12.25, Math.toRadians(180)))
+                .lineTo(new Vector2d(-58,-12.25))
+                .build();
+
+        TrajectorySequence goToPole = drive.trajectorySequenceBuilder(scorePose)
+                .lineToLinearHeading(new Pose2d(-40,-12.25, Math. toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-28,-8, Math.toRadians(65)))
                 .build();
 
         waitForStart();
-        drive.followTrajectorySequence(preloadToGoal);
-
+        drive.followTrajectorySequence(scorePreload);
+        robot.scoreHigh();
+        for (int i = 0; i < 3; i++) {
+            drive.followTrajectorySequence(goToStack);
+            robot.pickStack(i);
+            drive.followTrajectorySequence(goToPole);
+            robot.scoreHigh();
+        }
     }
 }
