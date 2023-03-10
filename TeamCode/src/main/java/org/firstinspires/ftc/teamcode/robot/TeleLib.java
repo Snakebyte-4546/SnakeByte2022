@@ -1,22 +1,18 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class TeleLib {
     public DcMotor fl;
     public DcMotor fr;
-    public DcMotor bl;
+    public DcMotor bl;.
     public DcMotor br;
     public DcMotor lift;
     public Servo claw;
 
     public int liftPos = 0;
-    boolean isOpen = false;
 
     public TeleLib(OpMode opMode) {
         fl = opMode.hardwareMap.dcMotor.get("fl");
@@ -89,7 +85,7 @@ public class TeleLib {
         }
     }
 
-    public void lift(OpMode opMode) throws InterruptedException {
+    public void lift(OpMode opMode) {
         if(Math.abs(opMode.gamepad2.left_stick_y) > 0.1) {
             if (opMode.gamepad2.right_trigger > .2) {
                 lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -113,22 +109,17 @@ public class TeleLib {
         if(opMode.gamepad2.y){
             liftPos = 2000;
         }
-        if (opMode.gamepad2.right_bumper) {
-            if (isOpen) {
-                claw.setPosition(1);
-            } else {
-                claw.setPosition(.5);
-            }
-            isOpen = !isOpen;
-            opMode.telemetry.addData("isOpen", isOpen);
-            opMode.telemetry.update();
-            while (opMode.gamepad2.right_bumper) {
-                Thread.sleep(100);
-            }
-        }
         opMode.telemetry.addData("Lift target pos: ", liftPos);
         opMode.telemetry.addData("Lift current position: ", lift.getCurrentPosition());
         opMode.telemetry.update();
+    }
+
+    public void claw(OpMode opMode) {
+        if (opMode.gamepad2.right_bumper) {
+                claw.setPosition(1);
+        } else if (opMode.gamepad2.left_bumper) {
+            claw.setPosition(.5);
+        }
     }
 
     public void kill() {
