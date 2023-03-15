@@ -30,43 +30,43 @@ public class AutoMethods {
     public int getHeight(String code){
         int returnHeight = 0;
         if(code.equals("high")){
-            returnHeight = 1900;
+            returnHeight = 4100;
         }
         else if(code.equals("mid")){
-            returnHeight = 1300;
+            returnHeight = 2300;
         }
         else if(code.equals("low")){
-            returnHeight = 800;
+            returnHeight = 1800;
         }
         else if(code.equals("driving")){
             returnHeight = 0;
         }
         else if(code.equals("s5")){
-            returnHeight = 850;
+            returnHeight = 1250;
         } else if(code.equals("s4")){
-            returnHeight = 775;
+            returnHeight = 1075;
         } else if(code.equals("s3")){
-            returnHeight = 700;
+            returnHeight = 900;
         } else if(code.equals("s2")){
-            returnHeight=625;
+            returnHeight=825;
         } else if(code.equals("s1")){
-            returnHeight=550;
+            returnHeight=750;
         }
         return returnHeight;
     }
 
     public void moveLift(double speed, String position) {
         ticks = getHeight(position);
-        lift.setTargetPosition(-ticks);
+        lift.setTargetPosition(ticks);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift.setPower(-speed);
+        lift.setPower(speed);
     }
 
     public void clamp(boolean isOpen) {
         if(!isOpen){
-            claw.setPosition(1);
-        } else {
             claw.setPosition(.5);
+        } else {
+            claw.setPosition(1);
         }
     }
 
@@ -107,21 +107,24 @@ public class AutoMethods {
     }
 
     public void scoreHigh() {
-        moveLift(0.5, "high");
+        moveLift(1, "high");
+        wait(5000);
+        /*
+        wait(3000);
+        clamp(true);
         wait(1000);
-        clamp(false);
-        wait(500);
-        moveLift(0.5, "driving");
+        moveLift(1, "driving");
+         */
     }
 
     public void pickStack(int i){
         clamp(true);
         if(i == 1){
-            moveLift(0.5, "s5");
+            moveLift(1, "s5");
         } else if(i == 2){
-            moveLift(0.5, "s4");
+            moveLift(1, "s4");
         } else if(i == 3){
-            moveLift(0.5, "s3");
+            moveLift(1, "s3");
         }
         wait(500);
         clamp(false);

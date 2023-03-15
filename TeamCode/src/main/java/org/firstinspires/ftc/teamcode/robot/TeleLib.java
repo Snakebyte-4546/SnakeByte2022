@@ -2,12 +2,13 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class TeleLib {
     public DcMotor fl;
     public DcMotor fr;
-    public DcMotor bl;.
+    public DcMotor bl;
     public DcMotor br;
     public DcMotor lift;
     public Servo claw;
@@ -98,16 +99,19 @@ public class TeleLib {
         } else {
             lift.setTargetPosition(liftPos);
             lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift.setPower(1);
+            lift.setPower(.1);
         }
         if(opMode.gamepad2.a){
-            liftPos = 700;
+            liftPos = 100;
         }
         if(opMode.gamepad2.b){
-            liftPos = 1050;
+            liftPos = 200;
         }
         if(opMode.gamepad2.y){
-            liftPos = 2000;
+            liftPos = 300;
+        }
+        if (opMode.gamepad1.x){
+            liftPos = 400;
         }
         opMode.telemetry.addData("Lift target pos: ", liftPos);
         opMode.telemetry.addData("Lift current position: ", lift.getCurrentPosition());

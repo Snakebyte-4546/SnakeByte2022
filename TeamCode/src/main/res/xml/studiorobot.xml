@@ -4,7 +4,6 @@
         <LynxModule name="Expansion Hub 2" port="2">
             <RevRobotics20HDHexMotor name="lift" port="3" />
             <RevRobotics20HDHexMotor name="lift2" port="2" />
-
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />

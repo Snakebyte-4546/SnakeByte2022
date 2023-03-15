@@ -4,6 +4,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.robot.AprilTagDetectionPipeline;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 @Autonomous(name = "Left Side Auto", group = "Score Auto")
 public class LeftSideScore extends LinearOpMode {
     int tagOfInterest = 0;
+    boolean hasRun = false;
 
     @Override
     public void runOpMode() {
@@ -45,8 +48,6 @@ public class LeftSideScore extends LinearOpMode {
             }
             telemetry.update();
         }
-
-        waitForStart();
         robot.ready(this);
         Pose2d startPose = new Pose2d(-35, -64, Math.toRadians(90));
         Pose2d scorePose = new Pose2d(-29, -8, Math.toRadians(55));
@@ -54,51 +55,80 @@ public class LeftSideScore extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
         TrajectorySequence scorePreload = drive.trajectorySequenceBuilder(startPose)
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "high");
+                })
                 .lineTo(new Vector2d(-35,-35))
                 .splineTo(new Vector2d(-29,-8), Math.toRadians(55))
+                .addDisplacementMarker(() -> {
+                    robot.clamp(true);
+                })
                 .build();
 
         TrajectorySequence goToStack = drive.trajectorySequenceBuilder(scorePose)
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "driving");
+                })
                 .lineTo(new Vector2d(-31,-10))
                 .lineToLinearHeading(new Pose2d(-38,-11.8, Math.toRadians(180)))
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "s5");
+                })
                 .lineTo(new Vector2d(-58,-11.8))
+                .addDisplacementMarker(() -> {
+                    robot.clamp(false);
+                })
                 .build();
 
         TrajectorySequence goToPole = drive.trajectorySequenceBuilder(stackPose)
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "high");
+                })
                 .lineToLinearHeading(new Pose2d(-40,-11.8, Math. toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-29,-8, Math.toRadians(55)))
+                .addDisplacementMarker(() -> {
+                    robot.clamp(true);
+                })
                 .build();
 
         TrajectorySequence park1 = drive.trajectorySequenceBuilder(scorePose)
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "driving");
+                })
                 .lineToLinearHeading(new Pose2d(-40,-11.8, Math. toRadians(180)))
                 .lineTo(new Vector2d(-58,-11.8))
                 .build();
 
         TrajectorySequence park2 = drive.trajectorySequenceBuilder(scorePose)
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "driving");
+                })
                 .lineToLinearHeading(new Pose2d(-35,-11.8, Math.toRadians(180)))
                 .build();
 
         TrajectorySequence park3 = drive.trajectorySequenceBuilder(scorePose)
-                .lineToLinearHeading(new Pose2d(-10,-11.8, Math.toRadians(180)))
+                .addDisplacementMarker(() -> {
+                    robot.moveLift(1, "driving");
+                }).
+                lineToLinearHeading(new Pose2d(-10,-11.8, Math.toRadians(180)))
                 .build();
 
         waitForStart();
-        drive.followTrajectorySequence(scorePreload);
-        robot.scoreHigh();
-        //TODO: Fix stuck in stop()
-        //TODO: Implement smart cycle timer
-        for (int i = 0; i < 2; i++) {
-            drive.followTrajectorySequence(goToStack);
-            robot.pickStack(i);
-            drive.followTrajectorySequence(goToPole);
-            robot.scoreHigh();
-        }
-        if (tagOfInterest == 1) {
-            drive.followTrajectorySequence(park1);
-        } else if (tagOfInterest == 2) {
-            drive.followTrajectorySequence(park2);
-        } else if (tagOfInterest == 3) {
-            drive.followTrajectorySequence(park3);
+        while (!isStopRequested() & !hasRun){
+            drive.followTrajectorySequence(scorePreload);
+            //TODO: Implement smart cycle timer
+            for (int i = 0; i < 2; i++) {
+                drive.followTrajectorySequence(goToStack);
+                drive.followTrajectorySequence(goToPole);
+            }
+            if (tagOfInterest == 1) {
+                drive.followTrajectorySequence(park1);
+            } else if (tagOfInterest == 2) {
+                drive.followTrajectorySequence(park2);
+            } else if (tagOfInterest == 3) {
+                drive.followTrajectorySequence(park3);
+            }
+            hasRun = true;
         }
     }
 }
