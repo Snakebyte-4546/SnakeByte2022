@@ -6,6 +6,8 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
@@ -13,7 +15,8 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 @TeleOp(name = "Modular- v0.2",group = "roadrunner")
 public class ModularTeleOp extends LinearOpMode {
 
-    //public DcMotorEx lift;
+    public DcMotorEx lift;
+    public Servo claw;
     public BNO055IMU imu;
 
 
@@ -49,8 +52,8 @@ public class ModularTeleOp extends LinearOpMode {
 
 
     //  LIFT PARAMS
-    public static double LIFT_SPEED = 150;
     public int liftTarget;
+    public int liftSpeed = 150;
     public int liftMax; //lower center of grav for drivetrain
 
 
@@ -89,10 +92,12 @@ public class ModularTeleOp extends LinearOpMode {
         imu.initialize(parameters);
 
 //      LIFT SETUP
-        //lift = hardwareMap.get(DcMotorEx.class, "lift");
-        //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift = hardwareMap.get(DcMotorEx.class, "lift");
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        claw = hardwareMap.get(Servo.class, "claw");
 
 //      HEADING TUNER
         boolean adjustingHeading;
@@ -137,6 +142,8 @@ public class ModularTeleOp extends LinearOpMode {
 //          INPUT CHECKS
             precisionToggleCheck();
             speedCalculator();
+            liftControlCheck();
+            clawControlCheck();
 
 
 //          HEADING CALC
@@ -147,7 +154,7 @@ public class ModularTeleOp extends LinearOpMode {
 
 
 //          VECTOR CALC
-            if (vectorCheckAndSet_LStick_NoOdom(drive))         {}
+            if (vectorCheckAndSet_LStick_NoOdom(drive)) {}
 
             //vectorErrorCalc(drive);
             //vectorErrorCalc_MoreRawValues(drive);
@@ -262,8 +269,6 @@ public class ModularTeleOp extends LinearOpMode {
         return false;
     }
 
-
-
     private boolean headingCheck_2Fingers(MecanumDrive drive) {
         if (gamepad1.touchpad_finger_2_x != 0 || gamepad1.touchpad_finger_2_y != 0) {
 
@@ -291,6 +296,8 @@ public class ModularTeleOp extends LinearOpMode {
         return false;
     }
 
+    //OTHER METHODS
+
     private void speedCalculator() {
         speed = .3 + (gamepad1.left_trigger * .7);
     }
@@ -304,5 +311,33 @@ public class ModularTeleOp extends LinearOpMode {
             timeAtLastPHChange = (int)runtime.time();
             precisionHeading = !precisionHeading;
         }
+    }
+
+    private boolean liftControlCheck() {
+        if (gamepad1.dpad_up) {
+            lift.setPower(-1);
+            //lift.setTargetPosition(lift.getCurrentPosition() + (int)(gamepad2.left_stick_y * liftSpeed));
+            return true;
+        }
+        else if (gamepad1.dpad_down) {
+            lift.setPower(1);
+            return true;
+        }
+        else {
+            lift.setPower(0);
+        }
+        return false;
+    }
+
+    private boolean clawControlCheck() {
+        if (gamepad1.dpad_right) {
+            claw.setPosition(1);
+            return true;
+        }
+        else if (gamepad1.dpad_left) {
+            claw.setPosition(0);
+            return true;
+        }
+        return false;
     }
 }
