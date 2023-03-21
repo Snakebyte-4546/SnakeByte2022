@@ -24,11 +24,11 @@ public class FieldCentricTeleOp extends LinearOpMode {
     public static double maxSpeed = 1.5; //                     1st TEST INCREASING THIS
 
     public static double speed;  //                           2nd TRY TO MAKE THIS NON-STATIC
-    public static double LIFTSPEED = 150;
-    public static int FOURBARSPEED = 100;
+    //public static double LIFTSPEED = 150;
+    //public static int FOURBARSPEED = 100;
 
-    public DcMotorEx lift;
-    public DcMotor fourbar;
+    //public DcMotorEx lift;
+    //public DcMotor fourbar;
     //public Servo claw;
     public BNO055IMU imu;
 
@@ -100,20 +100,19 @@ public class FieldCentricTeleOp extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(-30, 0, Math.toRadians(0)));
 
 
-        //claw = hardwareMap.servo.get("claw");
 
         timeSincePress.reset();
 
-        lift = hardwareMap.get(DcMotorEx.class, "lift");
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //lift = hardwareMap.get(DcMotorEx.class, "lift");
+        //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //lift.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        fourbar = hardwareMap.dcMotor.get("4bar");
-        fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fourbar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //fourbar = hardwareMap.dcMotor.get("4bar");
+        //fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //fourbar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //fourbar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -152,8 +151,8 @@ public class FieldCentricTeleOp extends LinearOpMode {
                 //claw.setPosition(0);
                 lift_targetPosition = 0;
                 PIDLift();
-                fourbar.setTargetPosition(0);
-                fourbar.setPower(1);
+                //fourbar.setTargetPosition(0);
+                //fourbar.setPower(1);
             }
             // Drivetrain speed calculations
             if (gamepad1.right_trigger > 0.1) {
@@ -221,7 +220,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
                             -speed);
                     gamepad1.rumble(200);
                 }
-                else { // STICK HEADING
+                else { // STICK TRANSLATION
                     targetVector = new Vector2d(targetVector.getX() + (-gamepad1.left_stick_y * speed),
                             targetVector.getY() + (-gamepad1.left_stick_x * speed));
 
@@ -257,7 +256,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
             else if (gamepad1.square) angle = 90;
             else if (gamepad1.cross) angle = 180;
             else if (gamepad1.circle) angle = 270;
-            else if (gamepad1.right_stick_x > .05 || gamepad1.right_stick_x < -.05 || gamepad1.right_stick_y > .05 || gamepad1.right_stick_y < -.05) {
+            else if (gamepad1.right_stick_x > .15 || gamepad1.right_stick_x < -.15 || gamepad1.right_stick_y > .15 || gamepad1.right_stick_y < -.15) {
                 angle = Math.toDegrees(Math.atan2(gamepad1.right_stick_x, gamepad1.right_stick_y)) + 180;
                 timeFromLastInput.reset();
             } /*else if (timeFromLastInput.time() > 500) {
@@ -270,15 +269,15 @@ public class FieldCentricTeleOp extends LinearOpMode {
 
 
             //lif pos set Driver 2
-            if (lift.getCurrentPosition() > liftMax + 50) {
+            if (60 > liftMax + 50) {
                 lift_targetPosition = liftMax;
             } else if (gamepad2.dpad_up && lift_targetPosition < 2000) {          //manual control with up/down
                 gamepad2.rumble(2);
-                lift_targetPosition += LIFTSPEED;
+                //lift_targetPosition += LIFTSPEED;
                 liftTarget = (int) lift_targetPosition;
             } else if (gamepad2.dpad_down && lift_targetPosition > -100) {
                 gamepad2.rumble(2);//manual down
-                lift_targetPosition += -LIFTSPEED;
+                //lift_targetPosition += -LIFTSPEED;
                 liftTarget = (int) lift_targetPosition;
             } else if (gamepad2.dpad_right) {                                //auto set to boundries with left/right
                 gamepad2.rumbleBlips(1);
@@ -295,39 +294,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
             gamepad2.rumble((int) liftError);
 
 
-            //four bar manual for driver 2
-            if (gamepad2.right_stick_y > .04 || gamepad2.right_stick_y < -.04) {
-                //claw.setPosition(0);
-                fourbar.setTargetPosition((int) (fourbar.getCurrentPosition() + gamepad2.right_stick_y * 20));
-                fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            } else if (gamepad2.a) {  //four bar down / reset base lower if hold
-                //claw.setPosition(0);
-                if (firstLoopPressed) {
-                    fourbar_targetPosition = 0;
-                    fbarHoldLow.reset();
-                    firstLoopPressed = false;
-                } else if (fbarHoldLow.time() < 500) {
-                    fourbar_targetPosition = 0;
-                } else if (fbarHoldLow.time() > 500) {
-                    fourbar_targetPosition = fourbar_targetPosition - 20;
-                }
-            } else if (!firstLoopPressed) {
-                firstLoopPressed = true;
-                fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            } else if (gamepad2.b && fourbar.getCurrentPosition() > -0) {
-                //claw.setPosition(0);//fourbar front
-                fourbar_targetPosition = fourbar.getCurrentPosition() - FOURBARSPEED;
-            } else if (gamepad2.y) {//fourbar up
-                //claw.setPosition(0);
-                fourbar_targetPosition = 1000;
-            } else if (gamepad2.x && fourbar.getCurrentPosition() < 1050) {
-                //claw.setPosition(0);//fourbar back
-                fourbar_targetPosition = fourbar.getCurrentPosition() + FOURBARSPEED;
-            }
-
-            fourbar.setTargetPosition(fourbar_targetPosition);
-            fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            fourbar.setPower(1);
 
             //from touch input to radial, robot matching numbers
             double angleOfTouchpad = (360 - (Math.toDegrees(Math.atan2(gamepad1.touchpad_finger_1_x * 2, gamepad1.touchpad_finger_1_y)))) - 360;
@@ -384,16 +350,6 @@ public class FieldCentricTeleOp extends LinearOpMode {
         return Math.toRadians(headingError);
     }
 
-    public void fourbarFindRest(MecanumDrive drive) {
-       fourbar.setTargetPosition(-2000);
-       fourbar.setPower(.8);
-       sleep(500);
-       fourbar.setPower(0);
-       fourbar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       fourbar.setTargetPosition(40);
-       fourbar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-    }
 
     public double HeadingCalculator_Angle(MecanumDrive drive, double targetHeading) {
         double actualHeading = Math.toDegrees(drive.getExternalHeading());
@@ -405,14 +361,12 @@ public class FieldCentricTeleOp extends LinearOpMode {
     }
 
 
-    public boolean liftAtTarget() {
-        return (lift.getCurrentPosition() >= (lift_targetPosition - lift_errorTolerance) && lift.getCurrentPosition() <= (lift_targetPosition + lift_errorTolerance)) && !(lift_deltaError >= 25);
-    }
+
     public void PIDLift() {
         lift_PIDTimer.reset();
 
-        double currentPosition = lift.getCurrentPosition();
-        liftError = lift_targetPosition - currentPosition;
+        //double currentPosition = lift.getCurrentPosition();
+        //liftError = lift_targetPosition - currentPosition;
         //telemetry.addLine("Error:  " + liftError);
         //telemetry.addData("Error", liftError);
 
@@ -425,7 +379,7 @@ public class FieldCentricTeleOp extends LinearOpMode {
         lift_pidGains.kI = lift_integral * lift_PIDCOEFFS.kI;
         lift_pidGains.kD = derivative * lift_PIDCOEFFS.kD;
 
-        lift.setVelocity(lift_pidGains.kP + lift_pidGains.kI + lift_pidGains.kD);
+        //lift.setVelocity(lift_pidGains.kP + lift_pidGains.kI + lift_pidGains.kD);
         lift_lastError = liftError;
     }
 }
